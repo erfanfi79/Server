@@ -1,4 +1,7 @@
 import models.Account;
+import packet.ChatRoomPacket;
+import packet.LoginPacket;
+import packet.Packet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -27,7 +30,20 @@ public class ClientThread extends Thread {
 
     @Override
     public void run() {
-        super.run();
+
+        while (true) {
+            try {
+
+                Packet packet = (Packet) objectInputStream.readObject();
+
+                if (packet instanceof ChatRoomPacket);
+                if (packet instanceof LoginPacket);
+
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void disconnect() {
