@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<HBox fx:id="item" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="739.0" spacing="150.0" style="-fx-background-color: #3c63a3; -fx-background-radius: 5; -fx-background-insets: 0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MatchHistoryController">
+   <children>
+      <Label fx:id="labelRank" text="rank" textFill="#b7c3c7">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="labelUsername" text="Username" textFill="#b7c3d7">
+         <font>
+            <Font size="16.0" />
+         </font></Label>
+      <Label fx:id="labelHighScore" text="Highest Score" textFill="#b7c3d7">
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+   </children>
+   <effect>
+      <DropShadow blurType="GAUSSIAN" height="5.0" radius="2.0" width="5.0" />
+   </effect>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <padding>
+      <Insets left="100.0" />
+   </padding>
+</HBox>
