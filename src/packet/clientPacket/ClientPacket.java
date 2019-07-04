@@ -1,4 +1,6 @@
 package packet.clientPacket;
 
-public class ClientPacket {
+import java.io.Serializable;
+
+public class ClientPacket implements Serializable {
 }

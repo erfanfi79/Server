@@ -1,6 +1,8 @@
 package packet.serverPacket;
 
-public class ServerLogPacket extends ServerPacket {
+import java.io.Serializable;
+
+public class ServerLogPacket extends ServerPacket implements Serializable {
 
     private boolean isSuccessful = false;
     private String log;
