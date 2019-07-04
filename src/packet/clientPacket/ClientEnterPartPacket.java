@@ -1,6 +1,6 @@
 package packet.clientPacket;
 
-public class ClientEnterPartPacket {
+public class ClientEnterPartPacket extends ClientPacket {
 
     private ClientEnterPartPacket part;
 
