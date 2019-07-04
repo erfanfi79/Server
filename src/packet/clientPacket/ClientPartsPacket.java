@@ -7,5 +7,6 @@ public enum ClientPartsPacket {
     MATCH_HISTORY,
     SHOP,
     COLLECTION,
+    BATTLE_MENU,
     GET_MONEY
 }

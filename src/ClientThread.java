@@ -1,6 +1,10 @@
 import models.Account;
 import models.ChatRoom.ChatRoom;
 import packet.clientPacket.*;
+import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
+import packet.clientPacket.clientMatchPacket.ClientInsertCardPacket;
+import packet.clientPacket.clientMatchPacket.ClientMovePacket;
+import packet.clientPacket.clientMatchPacket.ClientWithoutVariableMatchPacket;
 import packet.serverPacket.ServerLogPacket;
 import packet.serverPacket.ServerMoneyPacket;
 import packet.serverPacket.ServerPacket;
@@ -69,6 +73,26 @@ public class ClientThread extends Thread {
                 serverMoneyPacket.setMoney(account.getMoney());
                 sendPacketToClient(serverMoneyPacket);
                 break;
+        }
+    }
+
+
+    private void matchInputHandler() {
+
+        //todo if game finished exit from the while
+
+        while (true) {
+            try {
+                ClientPacket packet = (ClientPacket) objectInputStream.readObject();
+
+                if (packet instanceof ClientMovePacket);
+                else if (packet instanceof ClientAttackPacket);
+                else if (packet instanceof ClientInsertCardPacket);
+                else if (packet instanceof ClientWithoutVariableMatchPacket);
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
     private void accountMenu(ClientLoginPacket clientLoginPacket){
