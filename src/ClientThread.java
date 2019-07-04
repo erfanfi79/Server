@@ -1,6 +1,8 @@
 import models.Account;
 import models.ChatRoom.ChatRoom;
 import packet.clientPacket.*;
+import packet.serverPacket.ServerLogPacket;
+import packet.serverPacket.ServerMoneyPacket;
 import packet.serverPacket.ServerPacket;
 import serverHandler.LoginHandler;
 
@@ -48,6 +50,7 @@ public class ClientThread extends Thread {
                 else if (packet instanceof  ClientStartMatchPacket);
 
 
+
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -61,10 +64,19 @@ public class ClientThread extends Thread {
             case CHAT_ROOM:
                 ChatRoom.getInstance().sendMassagesToClient(objectOutputStream);
                 break;
+            case GET_MONEY:
+                ServerMoneyPacket serverMoneyPacket=new ServerMoneyPacket();
+                serverMoneyPacket.setMoney(account.getMoney());
+                sendPacketToClient(serverMoneyPacket);
+                break;
         }
     }
     private void accountMenu(ClientLoginPacket clientLoginPacket){
-        sendPacketToClient(new LoginHandler(clientLoginPacket).handleLogin());
+        LoginHandler loginHandler =new LoginHandler(clientLoginPacket);
+        ServerLogPacket serverLogPacket=loginHandler.handleLogin();
+        if (serverLogPacket.isSuccessful())
+            this.account=loginHandler.getAccount();
+        sendPacketToClient(serverLogPacket);
     }
 
     public void sendPacketToClient(ServerPacket serverPacket){

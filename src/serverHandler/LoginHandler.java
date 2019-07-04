@@ -8,6 +8,7 @@ import request.accountMenuRequest.AccountError;
 
 public class LoginHandler {
     String message = null;
+    Account account;
     ClientLoginPacket clientLoginPacket;
 
     public LoginHandler(ClientLoginPacket clientLoginPacket) {
@@ -20,7 +21,7 @@ public class LoginHandler {
         else
             signUp(clientLoginPacket.userName, clientLoginPacket.password);
         ServerLogPacket serverLogPacket = new ServerLogPacket();
-        if (message == null)
+        if (message == null || message.isEmpty())
             serverLogPacket.setSuccessful(true);
         serverLogPacket.setLog(message);
         return serverLogPacket;
@@ -28,7 +29,7 @@ public class LoginHandler {
 
     public void signIn(String userName, String password) {
         if (LoginMenu.getInstance().checkIfAccountExist(userName)) {
-            Account account = LoginMenu.getInstance().login(userName, password);
+             account = LoginMenu.getInstance().login(userName, password);
 
             if (account == null)
                 message = AccountError.PASSWORD_IS_INCORRECT.toString();
@@ -42,7 +43,11 @@ public class LoginHandler {
             message = AccountError.USERNAME_ALREADY_EXIST.toString();
             return;
         }
-        Account account = LoginMenu.getInstance().createAccount(userName, password);
+        account = LoginMenu.getInstance().createAccount(userName, password);
         Account.save(account);
+    }
+
+    public Account getAccount() {
+        return account;
     }
 }
