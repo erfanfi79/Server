@@ -1,4 +1,5 @@
 import models.Account;
+import models.ChatRoom.ChatRoom;
 import packet.clientPacket.ClientChatRoomPacket;
 import packet.clientPacket.ClientEnterPartPacket;
 import packet.clientPacket.ClientLoginPacket;
@@ -38,7 +39,9 @@ public class ClientThread extends Thread {
                 ClientPacket packet = (ClientPacket) objectInputStream.readObject();
 
                 if (packet instanceof ClientEnterPartPacket);
-                else if (packet instanceof ClientChatRoomPacket);
+                else if (packet instanceof ClientChatRoomPacket)
+                    ChatRoom.getInstance().sendMassage((ClientChatRoomPacket) packet);
+
                 else if (packet instanceof ClientLoginPacket);
 
 
