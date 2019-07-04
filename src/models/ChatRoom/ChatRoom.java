@@ -1,5 +1,6 @@
 package models.ChatRoom;
 
+import models.Account;
 import packet.clientPacket.ClientChatRoomPacket;
 import packet.serverPacket.ServerChatRoomPacket;
 
@@ -11,6 +12,7 @@ public class ChatRoom {
 
     private static ChatRoom chatRoom;
     private ArrayList<Massage> massages = new ArrayList<>();
+    //todo notification to all the users that exist in chat room
 
     public static ChatRoom getInstance() {
 
@@ -21,9 +23,10 @@ public class ChatRoom {
     private ChatRoom() {
     }
 
-    public synchronized void sendMassage(ClientChatRoomPacket clientChatRoomPacket, ObjectOutputStream objectOutputStream) {
+    public synchronized void sendMassage(Account account, ClientChatRoomPacket clientChatRoomPacket,
+                                         ObjectOutputStream objectOutputStream) {
 
-        massages.add(new Massage(clientChatRoomPacket.getUserName(), clientChatRoomPacket.getString()));
+        massages.add(new Massage(account.getUserName(), clientChatRoomPacket.getString()));
         sendMassagesToClient(objectOutputStream);
     }
 

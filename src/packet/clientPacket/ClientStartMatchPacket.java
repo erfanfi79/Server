@@ -1,6 +1,6 @@
 package packet.clientPacket;
 
-public class ClientStartMatchPacket {
+public class ClientStartMatchPacket extends ClientPacket{
 
     private boolean isMultiPlayerGame;
     private int gameMode, flagsNumber;

@@ -40,10 +40,12 @@ public class ClientThread extends Thread {
                     enterPartPacketHandler((ClientEnterPartPacket) packet);
 
                 else if (packet instanceof ClientChatRoomPacket)
-                    ChatRoom.getInstance().sendMassage((ClientChatRoomPacket) packet, objectOutputStream);
+                    ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet, objectOutputStream);
 
                 else if (packet instanceof ClientLoginPacket)
                     accountMenu((ClientLoginPacket)packet);
+
+                else if (packet instanceof  ClientStartMatchPacket);
 
 
             } catch (IOException | ClassNotFoundException e) {

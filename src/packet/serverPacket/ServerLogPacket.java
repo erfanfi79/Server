@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class ServerLogPacket extends ServerPacket implements Serializable {
 
-    private boolean isSuccessful = false;
+    private boolean isSuccessful;
     private String log;
 
     public String getLog() {

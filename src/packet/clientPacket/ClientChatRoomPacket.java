@@ -2,18 +2,10 @@ package packet.clientPacket;
 
 public class ClientChatRoomPacket extends ClientPacket {
 
-    private String userName, string;
-
-    public String getUserName() {
-        return userName;
-    }
+    private String string;
 
     public String getString() {
         return string;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public void setString(String string) {
