@@ -9,9 +9,11 @@ import request.accountMenuRequest.AccountError;
 public class LoginHandler {
     String message = null;
     ClientLoginPacket clientLoginPacket;
-    public LoginHandler(ClientLoginPacket clientLoginPacket){
-        this.clientLoginPacket=clientLoginPacket;
+
+    public LoginHandler(ClientLoginPacket clientLoginPacket) {
+        this.clientLoginPacket = clientLoginPacket;
     }
+
     public ServerLogPacket handleLogin() {
         if (clientLoginPacket.isLogin)
             signIn(clientLoginPacket.userName, clientLoginPacket.password);
@@ -37,12 +39,10 @@ public class LoginHandler {
 
     public void signUp(String userName, String password) {
         if (LoginMenu.getInstance().checkIfAccountExist(userName)) {
-            Account account = LoginMenu.getInstance().login(userName, password);
-
-            if (account == null)
-                message = AccountError.PASSWORD_IS_INCORRECT.toString();
-
-        } else
-            message = AccountError.USERNAME_DOESENT_EXIST.toString();
+            message = AccountError.USERNAME_ALREADY_EXIST.toString();
+            return;
+        }
+        Account account = LoginMenu.getInstance().createAccount(userName, password);
+        Account.save(account);
     }
 }
