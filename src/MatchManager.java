@@ -1,6 +1,6 @@
 public class MatchManager {
 
-    ClientThread clientThread1, clientThread2;
+    private ClientThread clientThread1, clientThread2;
 
     public MatchManager(ClientThread clientThread1, ClientThread clientThread2) {
 
