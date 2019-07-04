@@ -6,6 +6,5 @@ public enum ClientPartsPacket {
     LEADER_BOARD,
     MATCH_HISTORY,
     SHOP,
-    COLLECTION,
-    BATTLE_MENU
+    COLLECTION
 }
