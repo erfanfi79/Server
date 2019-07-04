@@ -17,11 +17,11 @@ public class ClientThread extends Thread {
     private boolean isPlaying = false;
 
     public ClientThread(Socket socket) {
-
         this.socket = socket;
         try {
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,7 +32,6 @@ public class ClientThread extends Thread {
 
         while (true) {
             try {
-
                 ClientPacket packet = (ClientPacket) objectInputStream.readObject();
 
                 if (packet instanceof ClientEnterPartPacket)
