@@ -62,15 +62,13 @@ public class ClientThread extends Thread {
         }
     }
     private void accountMenu(ClientLoginPacket clientLoginPacket){
-        sendPacket(new LoginHandler(clientLoginPacket).handleLogin());
-    }
-    public void disconnect() {
-
+        sendPacketToClient(new LoginHandler(clientLoginPacket).handleLogin());
     }
 
-    public void sendPacket(Object object){
+    public void sendPacketToClient(ServerPacket serverPacket){
+
         try {
-            objectOutputStream.writeObject(object);
+            objectOutputStream.writeObject(serverPacket);
         }catch (Exception e){
             e.printStackTrace();
         }
