@@ -2,13 +2,13 @@ package packet.clientPacket;
 
 public class ClientEnterPartPacket extends ClientPacket {
 
-    private ClientEnterPartPacket part;
+    private ClientPartsPacket part;
 
-    public ClientEnterPartPacket getPart() {
+    public ClientPartsPacket getPart() {
         return part;
     }
 
-    public ClientEnterPartPacket(ClientEnterPartPacket part) {
+    public ClientEnterPartPacket(ClientPartsPacket part) {
         this.part = part;
     }
 }

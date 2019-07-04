@@ -1,6 +1,6 @@
 package packet.clientPacket;
 
-public enum ClientPartsPocket {
+public enum ClientPartsPacket {
 
     CHAT_ROOM,
     LEADER_BOARD,
