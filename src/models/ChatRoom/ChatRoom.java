@@ -1,17 +1,20 @@
 package models.ChatRoom;
 
+import packet.clientPacket.ClientChatRoomPacket;
+
 import java.util.ArrayList;
 
 public class ChatRoom {
 
-    private ChatRoom chatRoom;
+    private static ChatRoom chatRoom;
     private ArrayList<Massage> massages = new ArrayList<>();
+
 
     public ArrayList<Massage> getMassages() {
         return massages;
     }
 
-    public ChatRoom getChatRoom() {
+    public static ChatRoom getInstance() {
 
         if (chatRoom == null) chatRoom = new ChatRoom();
         return chatRoom;
@@ -20,8 +23,8 @@ public class ChatRoom {
     private ChatRoom() {
     }
 
-    public synchronized void sendMassage(String userName, String massage) {
+    public synchronized void sendMassage(ClientChatRoomPacket clientChatRoomPacket) {
 
-        massages.add(new Massage(userName, massage));
+        massages.add(new Massage(clientChatRoomPacket.getUserName(), clientChatRoomPacket.getString()));
     }
 }

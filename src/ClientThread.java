@@ -1,7 +1,7 @@
 import models.Account;
-import packet.clientPocket.ClientChatRoomPacket;
-import packet.clientPocket.ClientLoginPacket;
-import packet.clientPocket.ClientPocket;
+import packet.clientPacket.ClientChatRoomPacket;
+import packet.clientPacket.ClientLoginPacket;
+import packet.clientPacket.ClientPacket;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -34,10 +34,10 @@ public class ClientThread extends Thread {
         while (true) {
             try {
 
-                ClientPocket packet = (ClientPocket) objectInputStream.readObject();
+                ClientPacket pocket = (ClientPacket) objectInputStream.readObject();
 
-                if (packet instanceof ClientChatRoomPacket);
-                if (packet instanceof ClientLoginPacket);
+                if (pocket instanceof ClientChatRoomPacket);
+                else if (pocket instanceof ClientLoginPacket);
 
 
             } catch (IOException | ClassNotFoundException e) {

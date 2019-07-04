@@ -1,6 +1,6 @@
-package packet.clientPocket;
+package packet.clientPacket;
 
-public class ClientLoginPacket extends ClientPocket {
+public class ClientLoginPacket extends ClientPacket {
 
     String userName, password;
     boolean isLogin;
