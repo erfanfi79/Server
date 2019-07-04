@@ -1,6 +1,8 @@
 import models.Account;
 import models.ChatRoom.ChatRoom;
 import packet.clientPacket.*;
+import packet.serverPacket.ServerPacket;
+import serverHandler.LoginHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,7 +42,8 @@ public class ClientThread extends Thread {
                 else if (packet instanceof ClientChatRoomPacket)
                     ChatRoom.getInstance().sendMassage((ClientChatRoomPacket) packet, objectOutputStream);
 
-                else if (packet instanceof ClientLoginPacket);
+                else if (packet instanceof ClientLoginPacket)
+                    accountMenu((ClientLoginPacket)packet);
 
 
             } catch (IOException | ClassNotFoundException e) {
@@ -58,8 +61,18 @@ public class ClientThread extends Thread {
                 break;
         }
     }
-
+    private void accountMenu(ClientLoginPacket clientLoginPacket){
+        sendPacket(new LoginHandler(clientLoginPacket).handleLogin());
+    }
     public void disconnect() {
 
+    }
+
+    public void sendPacket(Object object){
+        try {
+            objectOutputStream.writeObject(object);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

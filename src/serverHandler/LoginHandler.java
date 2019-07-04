@@ -8,8 +8,11 @@ import request.accountMenuRequest.AccountError;
 
 public class LoginHandler {
     String message = null;
-
-    public ServerLogPacket LoginHandler(ClientLoginPacket clientLoginPacket) {
+    ClientLoginPacket clientLoginPacket;
+    public LoginHandler(ClientLoginPacket clientLoginPacket){
+        this.clientLoginPacket=clientLoginPacket;
+    }
+    public ServerLogPacket handleLogin() {
         if (clientLoginPacket.isLogin)
             signIn(clientLoginPacket.userName, clientLoginPacket.password);
         else
