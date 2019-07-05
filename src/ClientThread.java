@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static packet.serverPacket.ServerEnum.MULTI_PLAYER_GAME_IS_READY;
 
@@ -50,7 +53,7 @@ public class ClientThread extends Thread {
                 ClientPacket packet = (ClientPacket) objectInputStream.readObject();
 
                 if (packet instanceof ClientEnumPacket)
-                    enterEnumPacketHandler((ClientEnumPacket) packet);
+                    enumPacketHandler((ClientEnumPacket) packet);
 
                 else if (packet instanceof ClientChatRoomPacket)
                     ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet, objectOutputStream);
@@ -67,9 +70,9 @@ public class ClientThread extends Thread {
         }
     }
 
-    private void enterEnumPacketHandler(ClientEnumPacket clientEnterPartPacket) {
+    private void enumPacketHandler(ClientEnumPacket clientEnumPacket) {
 
-        switch (clientEnterPartPacket.getPart()) {
+        switch (clientEnumPacket.getPart()) {
 
             case CHAT_ROOM:
                 ChatRoom.getInstance().sendMassagesToClient(objectOutputStream);
@@ -81,11 +84,43 @@ public class ClientThread extends Thread {
                 sendPacketToClient(serverMoneyPacket);
                 break;
 
+            case LEADER_BOARD:
+                sendLeaderboard();
+                break;
+
+            case MATCH_HISTORY:
+                sendMatchHistory();
+                break;
+
             case CANCEL_WAITING_FOR_MULTI_PLAYER_GAME:
                 Server.getWaitersForMultiPlayerGame().remove(this);
         }
     }
 
+    private void sendMatchHistory() {
+        ServerMatchHistory historyPacket=new ServerMatchHistory();
+        historyPacket.setHistories(account.getMatchHistories());
+        sendPacketToClient(historyPacket);
+    }
+
+    private void sendLeaderboard() {
+        ArrayList<String> usernames = new ArrayList<>();
+        ArrayList<Integer> winNumber = new ArrayList<>();
+        if (LoginMenu.getUsers().size() > 0)
+            Collections.sort(LoginMenu.getUsers(), new Comparator<Account>() {
+                public int compare(Account account1, Account account2) {
+                    return account1.getWinsNumber() - account2.getWinsNumber();
+                }
+            });
+        for (Account account : LoginMenu.getUsers()) {
+            usernames.add(account.getUserName());
+            winNumber.add(account.getWinsNumber());
+        }
+        ServerLeaderBoardPacket packet = new ServerLeaderBoardPacket();
+        packet.setUsernames(usernames);
+        packet.setWinNumber(winNumber);
+        sendPacketToClient(packet);
+    }
 
     private void startMatchPacketHandler(ClientStartMatchPacket packet) {
 

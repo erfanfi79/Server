@@ -97,13 +97,5 @@ public class AccountMenuController {
         }
     }
 
-    private void showLeaderboard() {
-        if (LoginMenu.getUsers().size() > 0)
-            Collections.sort(LoginMenu.getUsers(), new Comparator<Account>() {
-                public int compare(Account account1, Account account2) {
-                    return account1.getWinsNumber() - account2.getWinsNumber();
-                }
-            });
-        //AccountMenuView.getInstance().showLeaderBoard(LoginMenu.getUsers());
-    }
+
 }
