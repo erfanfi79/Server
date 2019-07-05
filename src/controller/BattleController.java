@@ -34,7 +34,7 @@ public class BattleController {
         return battleController;
     }
 
-    public void mainBattleController(Match match, Stage stage) {
+    public void mainBattleController(Match match) {
 
         this.match = match;
         gameLogic = match.getGameLogic();
@@ -42,13 +42,6 @@ public class BattleController {
         battleLogicController.setGameLogic(gameLogic);
         battleLogicController.setMatch(match);
         BattleLog.logTurnForWho(match.findPlayerPlayingThisTurn().getUserName());
-
-        new Thread(() -> {
-            Platform.runLater(()->{
-                battleUI.battleUI(stage);
-            });
-        }).start();
-
         manageRequest();
     }
 

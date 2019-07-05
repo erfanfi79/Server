@@ -25,6 +25,10 @@ public class ClientThread extends Thread {
 
     private boolean isPlaying = false;
 
+    public Account getAccount() {
+        return account;
+    }
+
     public ClientThread(Socket socket) {
 
         this.socket = socket;
@@ -46,7 +50,7 @@ public class ClientThread extends Thread {
                 ClientPacket packet = (ClientPacket) objectInputStream.readObject();
 
                 if (packet instanceof ClientEnumPacket)
-                    enterPartPacketHandler((ClientEnumPacket) packet);
+                    enterEnumPacketHandler((ClientEnumPacket) packet);
 
                 else if (packet instanceof ClientChatRoomPacket)
                     ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet, objectOutputStream);
@@ -63,7 +67,7 @@ public class ClientThread extends Thread {
         }
     }
 
-    private void enterPartPacketHandler(ClientEnumPacket clientEnterPartPacket) {
+    private void enterEnumPacketHandler(ClientEnumPacket clientEnterPartPacket) {
 
         switch (clientEnterPartPacket.getPart()) {
 
@@ -76,6 +80,9 @@ public class ClientThread extends Thread {
                 serverMoneyPacket.setMoney(account.getMoney());
                 sendPacketToClient(serverMoneyPacket);
                 break;
+
+            case CANCEL_WAITING_FOR_MULTI_PLAYER_GAME:
+                Server.getWaitersForMultiPlayerGame().remove(this);
         }
     }
 
@@ -95,7 +102,8 @@ public class ClientThread extends Thread {
             }
         } else {
 
-
+            //todo Single player game
+            matchInputHandler();
         }
     }
 
@@ -109,8 +117,14 @@ public class ClientThread extends Thread {
             try {
                 ClientPacket packet = (ClientPacket) objectInputStream.readObject();
 
-                if (packet instanceof ClientMovePacket) ;
-                else if (packet instanceof ClientAttackPacket) ;
+                if (packet instanceof ClientMovePacket)
+                    matchManager.move(this, ((ClientMovePacket) packet).getStartCoordination(),
+                            ((ClientMovePacket) packet).getDestinationCoordination());
+
+                else if (packet instanceof ClientAttackPacket)
+                    matchManager.attack(this, ((ClientAttackPacket) packet).getAttackerCoordination(),
+                            ((ClientAttackPacket) packet).getDefenderCoordination());
+
                 else if (packet instanceof ClientInsertCardPacket) ;
                 else if (packet instanceof ClientMatchEnumPacket) ;
 
