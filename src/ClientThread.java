@@ -1,10 +1,12 @@
 import models.Account;
 import models.ChatRoom.ChatRoom;
+import models.History;
+import models.LoginMenu;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
 import packet.clientPacket.clientMatchPacket.ClientInsertCardPacket;
-import packet.clientPacket.clientMatchPacket.ClientMovePacket;
 import packet.clientPacket.clientMatchPacket.ClientMatchEnumPacket;
+import packet.clientPacket.clientMatchPacket.ClientMovePacket;
 import packet.serverPacket.*;
 import serverHandler.LoginHandler;
 
@@ -12,6 +14,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static packet.serverPacket.ServerEnum.MULTI_PLAYER_GAME_IS_READY;
 
@@ -46,7 +51,7 @@ public class ClientThread extends Thread {
                 ClientPacket packet = (ClientPacket) objectInputStream.readObject();
 
                 if (packet instanceof ClientEnumPacket)
-                    enterPartPacketHandler((ClientEnumPacket) packet);
+                    enumPacketHandler((ClientEnumPacket) packet);
 
                 else if (packet instanceof ClientChatRoomPacket)
                     ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet, objectOutputStream);
@@ -63,9 +68,9 @@ public class ClientThread extends Thread {
         }
     }
 
-    private void enterPartPacketHandler(ClientEnumPacket clientEnterPartPacket) {
+    private void enumPacketHandler(ClientEnumPacket clientEnumPacket) {
 
-        switch (clientEnterPartPacket.getPart()) {
+        switch (clientEnumPacket.getPart()) {
 
             case CHAT_ROOM:
                 ChatRoom.getInstance().sendMassagesToClient(objectOutputStream);
@@ -76,9 +81,41 @@ public class ClientThread extends Thread {
                 serverMoneyPacket.setMoney(account.getMoney());
                 sendPacketToClient(serverMoneyPacket);
                 break;
+
+            case LEADER_BOARD:
+                sendLeaderboard();
+                break;
+
+            case MATCH_HISTORY:
+                sendMatchHistory();
+                break;
         }
     }
 
+    private void sendMatchHistory() {
+        ServerMatchHistory historyPacket=new ServerMatchHistory();
+        historyPacket.setHistories(account.getMatchHistories());
+        sendPacketToClient(historyPacket);
+    }
+
+    private void sendLeaderboard() {
+        ArrayList<String> usernames = new ArrayList<>();
+        ArrayList<Integer> winNumber = new ArrayList<>();
+        if (LoginMenu.getUsers().size() > 0)
+            Collections.sort(LoginMenu.getUsers(), new Comparator<Account>() {
+                public int compare(Account account1, Account account2) {
+                    return account1.getWinsNumber() - account2.getWinsNumber();
+                }
+            });
+        for (Account account : LoginMenu.getUsers()) {
+            usernames.add(account.getUserName());
+            winNumber.add(account.getWinsNumber());
+        }
+        ServerLeaderBoardPacket packet = new ServerLeaderBoardPacket();
+        packet.setUsernames(usernames);
+        packet.setWinNumber(winNumber);
+        sendPacketToClient(packet);
+    }
 
     private void startMatchPacketHandler(ClientStartMatchPacket packet) {
 
