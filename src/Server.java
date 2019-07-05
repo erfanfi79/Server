@@ -1,7 +1,22 @@
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Server {
+
+    private static LinkedList<ClientThread> onlineUsers = new LinkedList<>();
+    private static LinkedList<ClientThread> waitersForMultiPlayerGame = new LinkedList<>();
+
+    public static LinkedList<ClientThread> getOnlineUsers() {
+        return onlineUsers;
+    }
+
+    public static LinkedList<ClientThread> getWaitersForMultiPlayerGame() {
+        return waitersForMultiPlayerGame;
+    }
 
     public static void main(String[] args) throws IOException {
 

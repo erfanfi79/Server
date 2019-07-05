@@ -29,7 +29,7 @@ public class LoginHandler {
 
     public void signIn(String userName, String password) {
         if (LoginMenu.getInstance().checkIfAccountExist(userName)) {
-             account = LoginMenu.getInstance().login(userName, password);
+            account = LoginMenu.getInstance().login(userName, password);
 
             if (account == null)
                 message = AccountError.PASSWORD_IS_INCORRECT.toString();

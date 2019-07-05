@@ -1,6 +1,6 @@
 package packet.clientPacket;
 
-public enum ClientPartsPacket {
+public enum ClientEnum {
 
     CHAT_ROOM,
     LEADER_BOARD,
@@ -8,5 +8,7 @@ public enum ClientPartsPacket {
     SHOP,
     COLLECTION,
     BATTLE_MENU,
-    GET_MONEY
+    GET_MONEY,
+    CANCEL_WAITING_FOR_MULTI_PLAYER_GAME,
+
 }

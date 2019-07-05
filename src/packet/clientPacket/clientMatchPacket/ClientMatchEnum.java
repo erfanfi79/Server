@@ -1,6 +1,6 @@
 package packet.clientPacket.clientMatchPacket;
 
-public enum ClientWithoutVariableMatchPacketEnum {
+public enum ClientMatchEnum {
 
     END_TURN,
     END_GAME,
