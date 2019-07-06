@@ -14,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import models.*;
-import models.GamePlay.Match;
 import view.shopMenuView.ShopError;
 
 import java.io.IOException;
@@ -157,11 +156,11 @@ public class ShopController implements Initializable {
         ArrayList<Card> cards = account.getCollection().getCards();
         for (int i = cards.size() - 1; i >= 0; i--)
             if (cards.get(i).getCardName().equals(cardName)) {
-                account.getCollection().getCards().remove(cards.get(i));
-                account.setMoney(account.getMoney() + cards.get(i).getSellCost());
-                money.setText(String.valueOf(account.getMoney() + cards.get(i).getSellCost()));
+                account.setMoney(account.getMoney() + (cards.get(i).getPrice() * 3) / 4);
+                money.setText(String.valueOf(account.getMoney()));
                 account.getCollection().getCards().remove(cards.get(i));
                 labelErrorInShop.setText(ShopError.SUCCESS.toString());
+                showCards(cards);
                 return;
             }
         labelErrorInShop.setText(ShopError.CARD_NOT_FOUND.toString());

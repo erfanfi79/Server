@@ -4,8 +4,8 @@ import models.LoginMenu;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
 import packet.clientPacket.clientMatchPacket.ClientInsertCardPacket;
-import packet.clientPacket.clientMatchPacket.ClientMovePacket;
 import packet.clientPacket.clientMatchPacket.ClientMatchEnumPacket;
+import packet.clientPacket.clientMatchPacket.ClientMovePacket;
 import packet.serverPacket.*;
 import serverHandler.LoginHandler;
 
@@ -96,6 +96,19 @@ public class ClientThread extends Thread {
 
             case CANCEL_WAITING_FOR_MULTI_PLAYER_GAME:
                 Server.getWaitersForMultiPlayerGame().remove(this);
+                break;
+
+            case SAVE:
+                Account.save(account);
+                break;
+
+            case SHOP:
+                enterShop();
+                break;
+
+            case COLLECTION:
+                enterCollection();
+                break;
         }
     }
 
@@ -218,4 +231,15 @@ public class ClientThread extends Thread {
             e.printStackTrace();
         }
     }
+
+    private void enterShop() {
+        Collection collection = JsonToCard.initializeShopCollection();
+        sendPacketToClient(new ServerCollection(account.getCollection(), collection));
+    }
+
+    private void enterCollection() {
+        sendPacketToClient(new ServerCollection(account.getCollection()));
+    }
+
+
 }

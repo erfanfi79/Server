@@ -94,4 +94,10 @@ public class JsonToCard {
             }
         }
     }
+
+    public static Collection initializeShopCollection() {
+        Collection collection = new Collection();
+        JsonToCard.moveToCollection(collection);
+        return collection;
+    }
 }
