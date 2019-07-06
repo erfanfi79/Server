@@ -52,7 +52,7 @@ public class GraveYardController {
     }
 
     public void loadCards(Match match) {
-        ArrayList<Card> cards = match.getPlayer1GraveYard().getCards();
+        ArrayList<Card> cards = match.getPlayer1GraveYard().getDeadCards();
         Node[] nodes;
         for (int i = vboxGraveYardCards.getChildren().size() - 1; i >= 0; i--)
             vboxGraveYardCards.getChildren().remove(vboxGraveYardCards.getChildren().get(i));

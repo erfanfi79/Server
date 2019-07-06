@@ -6,15 +6,15 @@ import java.util.ArrayList;
 
 public class GraveYard {
 
-    private ArrayList<Card> cards = new ArrayList<>();
+    private ArrayList<Card> deadCards = new ArrayList<>();
 
-    public ArrayList<Card> getCards() {
+    public ArrayList<Card> getDeadCards() {
 
-        return cards;
+        return deadCards;
     }
 
     public void addCardToGraveYard(Card card) {
 
-        cards.add(card);
+        deadCards.add(card);
     }
 }

@@ -1,5 +1,6 @@
 import models.Account;
 import models.ChatRoom.ChatRoom;
+import models.LoginMenu;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
 import packet.clientPacket.clientMatchPacket.ClientInsertCardPacket;
@@ -61,7 +62,8 @@ public class ClientThread extends Thread {
                 else if (packet instanceof ClientLoginPacket)
                     accountMenu((ClientLoginPacket) packet);
 
-                else if (packet instanceof ClientStartMatchPacket) ;
+                else if (packet instanceof ClientStartMatchPacket)
+                    startMatchPacketHandler((ClientStartMatchPacket) packet);
 
 
             } catch (IOException | ClassNotFoundException e) {
@@ -85,7 +87,7 @@ public class ClientThread extends Thread {
                 break;
 
             case LEADER_BOARD:
-                sendLeaderboard();
+                sendLeaderBoard();
                 break;
 
             case MATCH_HISTORY:
@@ -98,13 +100,15 @@ public class ClientThread extends Thread {
     }
 
     private void sendMatchHistory() {
+
         ServerMatchHistory historyPacket=new ServerMatchHistory();
         historyPacket.setHistories(account.getMatchHistories());
         sendPacketToClient(historyPacket);
     }
 
-    private void sendLeaderboard() {
-        ArrayList<String> usernames = new ArrayList<>();
+    private void sendLeaderBoard() {
+
+        ArrayList<String> userNames = new ArrayList<>();
         ArrayList<Integer> winNumber = new ArrayList<>();
         if (LoginMenu.getUsers().size() > 0)
             Collections.sort(LoginMenu.getUsers(), new Comparator<Account>() {
@@ -112,12 +116,14 @@ public class ClientThread extends Thread {
                     return account1.getWinsNumber() - account2.getWinsNumber();
                 }
             });
+
         for (Account account : LoginMenu.getUsers()) {
-            usernames.add(account.getUserName());
+            userNames.add(account.getUserName());
             winNumber.add(account.getWinsNumber());
         }
+
         ServerLeaderBoardPacket packet = new ServerLeaderBoardPacket();
-        packet.setUsernames(usernames);
+        packet.setUsernames(userNames);
         packet.setWinNumber(winNumber);
         sendPacketToClient(packet);
     }
@@ -160,12 +166,37 @@ public class ClientThread extends Thread {
                     matchManager.attack(this, ((ClientAttackPacket) packet).getAttackerCoordination(),
                             ((ClientAttackPacket) packet).getDefenderCoordination());
 
-                else if (packet instanceof ClientInsertCardPacket) ;
-                else if (packet instanceof ClientMatchEnumPacket) ;
+                else if (packet instanceof ClientInsertCardPacket)
+                    matchManager.insert(this, ((ClientInsertCardPacket) packet).getWhichHandCard(),
+                            ((ClientInsertCardPacket) packet).getCoordination());
+
+                else if (packet instanceof ClientMatchEnumPacket)
+                    matchEnumInputHandler((ClientMatchEnumPacket) packet);
 
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void matchEnumInputHandler(ClientMatchEnumPacket packet) {
+
+        switch (packet.getPacket()) {
+
+            case END_TURN:
+                matchManager.endTurn();
+                break;
+
+            case END_GAME:
+                //todo
+                break;
+
+            case SPECIAL_POWER:
+                matchManager.useSpecialPower();
+                break;
+
+            case GRAVE_YARD:
+                matchManager.sendGraveYardToClient(this);
         }
     }
 

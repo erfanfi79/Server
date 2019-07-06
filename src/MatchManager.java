@@ -2,6 +2,7 @@ import models.*;
 import models.GamePlay.GameLogic;
 import models.GamePlay.Match;
 import packet.serverPacket.ServerLogPacket;
+import packet.serverPacket.serverMatchPacket.ServerGraveYardPacket;
 import view.battleView.BattleLog;
 
 import java.util.ArrayList;
@@ -90,11 +91,94 @@ public class MatchManager {
     }
 
 
+    public void insert(ClientThread client, int whichHandCard, Coordination targetCoordination) {
+
+        Card card = null;
+        if (whichHandCard >= 0 && whichHandCard < 5)
+            card = client.getAccount().getHand().getHandCards().get(whichHandCard);
+
+        Cell target = match.getTable().getCellByCoordination(targetCoordination);
+        if (!isInsertRequestValid(client, card, target)) return;
+        if (card instanceof Unit) gameLogic.insertProcess((Unit) card, target);
+        else gameLogic.insertProcess((Spell) card, target);
+    }
+
+    private boolean isInsertRequestValid(ClientThread client, Card card, Cell target) {
+
+        if (card == null || target == null) {
+            System.err.println("In MatchManager in isInsertRequestValid we have null");
+            return false;
+        }
+        if (!hasEnoughMana(card)) {
+            sendServerLogToClient(client, "You don't have enough mana");
+            return false;
+        }
+
+        if (card instanceof Unit) {
+
+            if (!isCellFill(target)) {
+                sendServerLogToClient(client, "Target is Invalid");
+                return false;
+            }
+            if (!isCellAvailableForInsert(target.getCoordination())) {
+                sendServerLogToClient(client, "Target is not available");
+                return false;
+            }
+        } else {
+            for (Spell spell: card.getSpells()) {
+
+                if (!spell.getTarget().isAffectCells()) {   //for minions and hero
+
+                    if (!isCellFill(target)) {
+                        sendServerLogToClient(client, "Cell is empty");
+                        return false;
+                    }
+                    if (spell.getTarget().isTargetEnemy() &&
+                            !target.getCard().getTeam().equals(match.findPlayerDoesNotPlayingThisTurn().getUserName())) {
+                        if (card.getSpells().size() == 1) {
+                            sendServerLogToClient(client, "It is your unit");
+                            return false;
+                        }
+                    }
+                    if (!spell.getTarget().isTargetEnemy() &&
+                            target.getCard().getTeam().equals(match.findPlayerDoesNotPlayingThisTurn().getUserName())) {
+                        if (card.getSpells().size() == 1) {
+                            sendServerLogToClient(client, "It is unit of enemy");
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+    public void endTurn() {
+        gameLogic.switchTurn();
+        //todo if match is single player play AI
+    }
+
+
+    public void useSpecialPower() {
+        gameLogic.useSpecialPower((Unit) match.findPlayerPlayingThisTurn().getHand().getHero());
+    }
+
+
+    public void sendGraveYardToClient(ClientThread client) {
+
+        if (client.getAccount().getUserName().equals(match.getPlayer1().getUserName()))
+            client.sendPacketToClient(new ServerGraveYardPacket(match.getPlayer1GraveYard().getDeadCards()));
+        else
+            client.sendPacketToClient(new ServerGraveYardPacket(match.getPlayer2GraveYard().getDeadCards()));
+    }
+
 
     private void sendServerLogToClient(ClientThread client, String log) {
 
         ServerLogPacket serverLogPacket = new ServerLogPacket();
-        serverLogPacket.setLog("Target is not valid");
+        serverLogPacket.setLog(log);
         client.sendPacketToClient(serverLogPacket);
     }
 

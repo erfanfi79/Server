@@ -1,7 +1,6 @@
 package controller;
 
 import javafx.application.Platform;
-import javafx.stage.Stage;
 import models.*;
 import models.GamePlay.GameLogic;
 import models.GamePlay.Match;
@@ -266,9 +265,9 @@ public class BattleController {
 
         try {
             if (match.findPlayerPlayingThisTurn().equals(match.getPlayer1()))
-                showCardsBattleView.setCard(Collection.findCardByCardID(match.getPlayer1GraveYard().getCards(), cardID));
+                showCardsBattleView.setCard(Collection.findCardByCardID(match.getPlayer1GraveYard().getDeadCards(), cardID));
             else
-                showCardsBattleView.setCard(Collection.findCardByCardID(match.getPlayer2GraveYard().getCards(), cardID));
+                showCardsBattleView.setCard(Collection.findCardByCardID(match.getPlayer2GraveYard().getDeadCards(), cardID));
 
             showCardsBattleView.show(showCardsBattleView);
         } catch (NullPointerException e) {
@@ -281,9 +280,9 @@ public class BattleController {
         ShowCardsBattleView showCardsBattleView = new ShowCardsBattleView();
         ArrayList<Card> cards;
         if (match.findPlayerPlayingThisTurn().equals(match.getPlayer1()))
-            cards = match.getPlayer1GraveYard().getCards();
+            cards = match.getPlayer1GraveYard().getDeadCards();
         else
-            cards = match.getPlayer2GraveYard().getCards();
+            cards = match.getPlayer2GraveYard().getDeadCards();
 
         for (Card card : cards)
             showCardsBattleView.setCard(card);
