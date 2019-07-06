@@ -1,5 +1,7 @@
 import models.Account;
 import models.ChatRoom.ChatRoom;
+import models.Collection;
+import models.JsonToCard;
 import models.LoginMenu;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
