@@ -37,6 +37,10 @@ public class Account implements Serializable {
         return money;
     }
 
+    public void setCollection(Collection collection) {
+        this.collection = collection;
+    }
+
     public void setMoney(int money) {
         this.money = money;
     }
