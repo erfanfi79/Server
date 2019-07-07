@@ -3,6 +3,7 @@ import models.GamePlay.GameLogic;
 import models.GamePlay.Match;
 import packet.serverPacket.ServerLogPacket;
 import packet.serverPacket.serverMatchPacket.ServerGraveYardPacket;
+import packet.serverPacket.serverMatchPacket.ServerPlayersUserNamePacket;
 import view.battleView.BattleLog;
 
 import java.util.ArrayList;
@@ -11,11 +12,23 @@ public class MatchManager {
 
     private Match match;
     private GameLogic gameLogic;
+    private ClientThread clientThread1, clientThread2;
 
     public MatchManager(ClientThread clientThread1, ClientThread clientThread2) {
 
+        this.clientThread1 = clientThread1;
+        this.clientThread2 = clientThread2;
         match = new Match(clientThread1.getAccount(), clientThread2.getAccount());
         gameLogic = match.getGameLogic();
+    }
+
+    public void sendPlayersNameToClients() {
+
+        ServerPlayersUserNamePacket packet = new ServerPlayersUserNamePacket(clientThread1.getAccount().getUserName(),
+                clientThread2.getAccount().getUserName());
+
+        clientThread1.sendPacketToClient(packet);
+        clientThread2.sendPacketToClient(packet);
     }
 
     public void move(ClientThread client, Coordination start, Coordination destination) {

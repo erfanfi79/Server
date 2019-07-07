@@ -75,7 +75,7 @@ public class ClientThread extends Thread {
 
     private void enumPacketHandler(ClientEnumPacket clientEnumPacket) {
 
-        switch (clientEnumPacket.getPart()) {
+        switch (clientEnumPacket.getPacket()) {
 
             case CHAT_ROOM:
                 ChatRoom.getInstance().sendMassagesToClient(objectOutputStream);
@@ -151,8 +151,15 @@ public class ClientThread extends Thread {
 
             else {
                 sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
+                Server.getWaitersForMultiPlayerGame().get(0).sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
+
+                //todo send game info to both players
+
                 matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
+                matchManager.sendPlayersNameToClients();
+
                 Server.getWaitersForMultiPlayerGame().remove(0);
+
                 matchInputHandler();
             }
         } else {
