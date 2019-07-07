@@ -2,13 +2,13 @@ package packet.clientPacket;
 
 public class ClientEnumPacket extends ClientPacket {
 
-    private ClientEnum part;
+    private ClientEnum packet;
 
-    public ClientEnum getPart() {
-        return part;
+    public ClientEnum getPacket() {
+        return packet;
     }
 
-    public ClientEnumPacket(ClientEnum part) {
-        this.part = part;
+    public ClientEnumPacket(ClientEnum packet) {
+        this.packet = packet;
     }
 }

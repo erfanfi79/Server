@@ -45,6 +45,10 @@ public class Account implements Serializable {
         this.money = money;
     }
 
+    public void incrementMoney(int money) {
+        this.money += money;
+    }
+
 
     public String getUserName() {
         return userName;

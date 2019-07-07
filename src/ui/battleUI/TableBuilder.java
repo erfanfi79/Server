@@ -78,9 +78,6 @@ public class TableBuilder {
 
                 table[row][column].getChildren().removeAll(table[row][column].getChildren());
 
-                if (cells[row][column].getFlag() != null)
-                    table[row][column].getChildren().add(new ImageView("resources/battle/flag/flag"));
-
                 if (cells[row][column].getCard() != null) {
 
                     ImageView image;
