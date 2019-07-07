@@ -1,12 +1,17 @@
 import models.*;
 import models.GamePlay.GameLogic;
 import models.GamePlay.Match;
+import packet.serverPacket.ServerEnumPacket;
 import packet.serverPacket.ServerLogPacket;
 import packet.serverPacket.serverMatchPacket.ServerGraveYardPacket;
+import packet.serverPacket.serverMatchPacket.ServerMatchInfoPacket;
 import packet.serverPacket.serverMatchPacket.ServerPlayersUserNamePacket;
+import packet.serverPacket.serverMatchPacket.VirtualCard;
 import view.battleView.BattleLog;
 
 import java.util.ArrayList;
+
+import static packet.serverPacket.ServerEnum.MULTI_PLAYER_GAME_IS_READY;
 
 public class MatchManager {
 
@@ -22,10 +27,40 @@ public class MatchManager {
         gameLogic = match.getGameLogic();
     }
 
+    public void sendStartMatchPacketToClients() {
+
+        clientThread1.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
+        clientThread2.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
+    }
+
     public void sendPlayersNameToClients() {
 
         ServerPlayersUserNamePacket packet = new ServerPlayersUserNamePacket(clientThread1.getAccount().getUserName(),
                 clientThread2.getAccount().getUserName());
+
+        clientThread1.sendPacketToClient(packet);
+        clientThread2.sendPacketToClient(packet);
+    }
+
+    public void sendMatchInfoToClients() {
+
+        ServerMatchInfoPacket packet = new ServerMatchInfoPacket();
+        Cell[][] cells = match.getTable().getCells();
+        VirtualCard[][] table = new VirtualCard[5][9];
+
+        for (int row = 0; row < 5; row++) {
+            for (int column  = 0; column < 9; column++) {
+                if (cells[row][column] != null) {
+
+                    Unit card = (Unit) cells[row][column].getCard();
+                    VirtualCard virtualCard = new VirtualCard(
+                            card.getCardName(), card.getManaCost(), card.getHealthPoint(), card.getAttackPoint());
+
+                    table[row][column] = virtualCard;
+                }
+            }
+        }
+        packet.setTable(table, match.getPlayer1Mana(), match.getPlayer2Mana());
 
         clientThread1.sendPacketToClient(packet);
         clientThread2.sendPacketToClient(packet);

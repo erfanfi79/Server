@@ -150,13 +150,10 @@ public class ClientThread extends Thread {
                 Server.getWaitersForMultiPlayerGame().add(this);
 
             else {
-                sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
-                Server.getWaitersForMultiPlayerGame().get(0).sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
-
-                //todo send game info to both players
-
                 matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
+                matchManager.sendStartMatchPacketToClients();
                 matchManager.sendPlayersNameToClients();
+                matchManager.sendMatchInfoToClients();
 
                 Server.getWaitersForMultiPlayerGame().remove(0);
 
