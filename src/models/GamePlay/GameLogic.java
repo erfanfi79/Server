@@ -6,19 +6,11 @@ import models.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static models.GamePlay.MatchResult.*;
 import static models.SpecialPowerType.ON_DEFEND;
 
 public class GameLogic {
 
-    public final int PLAYER1_WINS = 1;
-    public final int PLAYER2_WINS = 2;
-    public final int DRAW = 3;
-    public final int MATCH_HAS_NOT_ENDED = 0;
-    public final int NUMBER_OF_TURNS_TO_HOLD_THE_FLAG = 6;
-    int flagsNumber;
-    int turnsHavingFlagPlayer1; //todo initialize in dead and get
-    int turnsHavingFlagPlayer2;
-    String cardOnFlag = "";
     ArrayList<Card> attackedCardsInATurn = new ArrayList<>();      //todo add attacker to array
     ArrayList<Card> movedCardsInATurn = new ArrayList<>();
     ArrayList<Card> cardsInTablePlayer1 = new ArrayList<>(); //todo fill that in game and delete when minion die
@@ -75,7 +67,7 @@ public class GameLogic {
     }
 
 
-    public int getMatchResult() {
+    public MatchResult getMatchResult() {
 
         ArrayList<Card> player1Cards = match.player1.getCollection().getSelectedDeck().getCards();
         ArrayList<Card> player2Cards = match.player2.getCollection().getSelectedDeck().getCards();
@@ -93,7 +85,7 @@ public class GameLogic {
         return getMatchResultForKillTheHero();
     }
 
-    private int getMatchResultForKillTheHero() {
+    private MatchResult getMatchResultForKillTheHero() {
 
         int player1HeroHP = ((Unit) match.getPlayer1().getHand().getHero()).getHP();
         int player2HeroHP = ((Unit) match.getPlayer2().getHand().getHero()).getHP();
@@ -101,11 +93,11 @@ public class GameLogic {
         if (player1HeroHP <= 0 && player2HeroHP <= 0) return DRAW;
         if (player1HeroHP <= 0){
             BattleController.getInstance().setIsEndedGame(2);
-            return PLAYER2_WINS;
+            return PLAYER2;
         }
         if (player2HeroHP <= 0) {
             BattleController.getInstance().setIsEndedGame(1);
-            return PLAYER1_WINS;
+            return PLAYER1;
         }
 
         return MATCH_HAS_NOT_ENDED;

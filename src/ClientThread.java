@@ -169,7 +169,6 @@ public class ClientThread extends Thread {
 
     private void matchInputHandler() {
 
-        //todo if game finished exit from the while
         //todo pay attention to turn for who
 
         while (true) {
@@ -190,6 +189,8 @@ public class ClientThread extends Thread {
 
                 else if (packet instanceof ClientMatchEnumPacket)
                     matchEnumInputHandler((ClientMatchEnumPacket) packet);
+
+                if (matchManager.isMatchFinished()) break;
 
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

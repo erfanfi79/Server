@@ -1,6 +1,8 @@
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 import models.*;
 import models.GamePlay.GameLogic;
 import models.GamePlay.Match;
+import models.GamePlay.MatchResult;
 import packet.serverPacket.ServerEnumPacket;
 import packet.serverPacket.ServerLogPacket;
 import packet.serverPacket.serverMatchPacket.ServerGraveYardPacket;
@@ -11,6 +13,7 @@ import view.battleView.BattleLog;
 
 import java.util.ArrayList;
 
+import static packet.serverPacket.ServerEnum.MATCH_ENDED;
 import static packet.serverPacket.ServerEnum.MULTI_PLAYER_GAME_IS_READY;
 
 public class MatchManager {
@@ -172,7 +175,9 @@ public class MatchManager {
                 sendServerLogToClient(client, "Target is not available");
                 return false;
             }
+
         } else {
+
             for (Spell spell: card.getSpells()) {
 
                 if (!spell.getTarget().isAffectCells()) {   //for minions and hero
@@ -223,12 +228,66 @@ public class MatchManager {
     }
 
 
+    public boolean isMatchFinished() {
+
+        MatchResult matchResult = gameLogic.getMatchResult();
+        if (matchResult == MatchResult.MATCH_HAS_NOT_ENDED) return false;
+
+        History historyForPlayer1 = new History();
+        History historyForPlayer2 = new History();
+        historyForPlayer1.setLocalDateTime();
+        historyForPlayer2.setLocalDateTime();
+
+        switch (matchResult) {
+
+            case DRAW:
+                historyForPlayer1.setYourStatus(GameStatus.DRAW);
+                historyForPlayer2.setYourStatus(GameStatus.DRAW);
+                sendServerLogToClient(clientThread1, "GAME DRAW");
+                sendServerLogToClient(clientThread2, "GAME DRAW");
+                break;
+
+            case PLAYER1:
+                clientThread1.getAccount().incrementWinsNumber();
+                clientThread1.getAccount().incrementMoney(1000 /*awardOfGame*/);
+                historyForPlayer1.setYourStatus(GameStatus.WIN);
+                historyForPlayer2.setYourStatus(GameStatus.LOST);
+                sendServerLogToClient(clientThread1, "YOU WIN");
+                sendServerLogToClient(clientThread2, "YOU LOST");
+                break;
+
+            case PLAYER2:
+                clientThread2.getAccount().incrementWinsNumber();
+                clientThread2.getAccount().incrementMoney(1000 /*awardOfGame*/);
+                historyForPlayer1.setYourStatus(GameStatus.LOST);
+                historyForPlayer2.setYourStatus(GameStatus.WIN);
+                sendServerLogToClient(clientThread1, "YOU LOST");
+                sendServerLogToClient(clientThread2, "YOU WIN");
+                break;
+
+        }
+
+        clientThread1.getAccount().getMatchHistories().add(historyForPlayer1);
+        clientThread2.getAccount().getMatchHistories().add(historyForPlayer2);
+
+        clientThread1.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
+        clientThread2.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
+        return true;
+    }
+
+
     private void sendServerLogToClient(ClientThread client, String log) {
 
         ServerLogPacket serverLogPacket = new ServerLogPacket();
         serverLogPacket.setLog(log);
         client.sendPacketToClient(serverLogPacket);
     }
+
+
+
+    /*
+    down methods are logic of match
+     */
 
 
     private boolean isAttackedPreviously(Card card) {
