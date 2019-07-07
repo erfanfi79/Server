@@ -14,7 +14,7 @@ public class MatchManager {
 
     public MatchManager(ClientThread clientThread1, ClientThread clientThread2) {
 
-        match = new Match(MatchType.KILL_THE_HERO, clientThread1.getAccount(), clientThread2.getAccount());
+        match = new Match(clientThread1.getAccount(), clientThread2.getAccount());
         gameLogic = match.getGameLogic();
     }
 
@@ -34,19 +34,19 @@ public class MatchManager {
             return false;
         }
         if (!isCellAvailableForMove(card.getCell(), destinationCell)) {
-            sendServerLogToClient(client, "Target is invalid");
+            sendServerLogToClient(client, "Target isn't available for move");
             return false;
         }
         if (isUnitStunned((Unit) card)) {
             sendServerLogToClient(client, "Unit is stun");
             return false;
         }
-        if (isAttackedPreviously(card)) {
-            sendServerLogToClient(client, "Unit attacked previously");
-            return false;
-        }
         if (isMovedPreviously(card)) {
             sendServerLogToClient(client, "Unit moved previously");
+            return false;
+        }
+        if (isAttackedPreviously(card)) {
+            sendServerLogToClient(client, "Unit attacked previously");
             return false;
         }
         if (!isDirectionWithoutEnemyForMove(card.getCell(), destinationCell)) {
@@ -116,8 +116,8 @@ public class MatchManager {
 
         if (card instanceof Unit) {
 
-            if (!isCellFill(target)) {
-                sendServerLogToClient(client, "Target is Invalid");
+            if (isCellFill(target)) {
+                sendServerLogToClient(client, "Target is fill");
                 return false;
             }
             if (!isCellAvailableForInsert(target.getCoordination())) {

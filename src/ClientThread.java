@@ -67,7 +67,6 @@ public class ClientThread extends Thread {
                 else if (packet instanceof ClientStartMatchPacket)
                     startMatchPacketHandler((ClientStartMatchPacket) packet);
 
-
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }

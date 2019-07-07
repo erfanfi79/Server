@@ -33,6 +33,9 @@ public class BattleController {
         return battleController;
     }
 
+    private BattleController() {
+    }
+
     public void mainBattleController(Match match) {
 
         this.match = match;
@@ -41,7 +44,6 @@ public class BattleController {
         battleLogicController.setGameLogic(gameLogic);
         battleLogicController.setMatch(match);
         BattleLog.logTurnForWho(match.findPlayerPlayingThisTurn().getUserName());
-        manageRequest();
     }
 
     private void manageRequest() {
@@ -361,10 +363,7 @@ public class BattleController {
 
     private void requestWithoutVariable(RequestWithoutVariable request) {
 
-        if (request.getEnumRequest() == RequestWithoutVariableEnum.GAME_INFO_REQUEST)
-            gameInfoRequest();
-
-        else if (request.getEnumRequest() == RequestWithoutVariableEnum.SHOW_MY_MINIONS_REQUEST)
+        if (request.getEnumRequest() == RequestWithoutVariableEnum.SHOW_MY_MINIONS_REQUEST)
             showMyMinionsRequest();
 
         else if (request.getEnumRequest() == RequestWithoutVariableEnum.SHOW_OPPONENT_MINIONS_REQUEST)
@@ -387,88 +386,6 @@ public class BattleController {
 
         else if (request.getEnumRequest() == RequestWithoutVariableEnum.HELP_REQUEST)
             BattleLog.showHelp();
-    }
-
-    private void gameInfoRequest() {
-        Cell[][] cells = match.getTable().getCells();
-
-        if (match.getMatchType() == MatchType.KILL_THE_HERO)
-            gameInfoRequestKillTheHeroMode(cells);
-
-        else if (match.getMatchType() == MatchType.HOLD_THE_FLAG)
-            gameInfoRequestHoldTheFlagMode(cells);
-
-        else if (match.getMatchType() == MatchType.COLLECT_THE_FLAGS)
-            gameInfoRequestCollectTheFlagsMode(cells);
-    }
-
-    private void gameInfoRequestKillTheHeroMode(Cell[][] cells) {
-
-        GameInfoBattleViewKillTheHero gameInfoBattleViewKillTheHero = new GameInfoBattleViewKillTheHero();
-        gameInfoBattleViewKillTheHero.setPlayer1Mana(match.getPlayer1Mana());
-        gameInfoBattleViewKillTheHero.setPlayer2Mana(match.getPlayer2Mana());
-
-        //for find the hero
-        for (Cell[] row : cells) {
-            for (Cell cell : row) {
-
-                try {
-                    Card card = cell.getCard();
-
-                    if (card.getType() == CardType.HERO) {
-
-                        Unit hero = (Unit) card;
-
-                        if (match.getPlayer1().getUserName().equals(hero.getTeam()))
-                            gameInfoBattleViewKillTheHero.setPlayer1HeroHP(hero.getHealthPoint());
-                        else
-                            gameInfoBattleViewKillTheHero.setPlayer2HeroHP(hero.getHealthPoint());
-                    }
-                } catch (NullPointerException e) {
-                    //there isn't hero in this cell
-                }
-            }
-        }
-        gameInfoBattleViewKillTheHero.show(gameInfoBattleViewKillTheHero);
-    }
-
-    private void gameInfoRequestHoldTheFlagMode(Cell[][] cells) {
-
-        GameInfoBattleViewHoldTheFlag gameInfoBattleViewHoldTheFlag = new GameInfoBattleViewHoldTheFlag();
-        gameInfoBattleViewHoldTheFlag.setPlayer1Mana(match.getPlayer1Mana());
-        gameInfoBattleViewHoldTheFlag.setPlayer2Mana(match.getPlayer2Mana());
-
-        for (Cell[] row : cells) {
-            for (Cell cell : row) {
-
-                if (cell.getFlag() != null) {
-
-                    if (cell.getCard() == null) {
-
-                        gameInfoBattleViewHoldTheFlag.setFlagCoordination(cell.getCoordination());
-
-                    } else {
-
-                        gameInfoBattleViewHoldTheFlag.setFlagHolderName(cell.getCard().getCardName());
-                        gameInfoBattleViewHoldTheFlag.setFlagHolderTeam(cell.getCard().getTeam());
-                        gameInfoBattleViewHoldTheFlag.show(gameInfoBattleViewHoldTheFlag);
-                    }
-                }
-            }
-        }
-        gameInfoBattleViewHoldTheFlag.show(gameInfoBattleViewHoldTheFlag);
-    }
-
-    private void gameInfoRequestCollectTheFlagsMode(Cell[][] cells) {
-
-        GameInfoBattleViewCollectTheFlags gameInfoBattleViewCollectTheFlags = new GameInfoBattleViewCollectTheFlags();
-
-        for (Cell[] row : cells) {
-            for (Cell cell : row) {
-                //todo
-            }
-        }
-        gameInfoBattleViewCollectTheFlags.show(gameInfoBattleViewCollectTheFlags);
     }
 
     private void showMyMinionsRequest() {

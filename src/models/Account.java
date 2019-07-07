@@ -82,24 +82,12 @@ public class Account implements Serializable {
         collection = new Collection();
     }
 
-    public static Account getAIAccount(MatchType matchType) {
+    public static Account getAIAccount() {
         Account account = new Account();
         account.setUserName("Bot");
         account.isAI = true;
-      switch (matchType) {
-            case KILL_THE_HERO:
-                account.getCollection().getDecks().add(Deck.getDefaultMode1deck());
-                account.getCollection().setSelectedDeck(Deck.getDefaultMode1deck());
-                break;
-            case HOLD_THE_FLAG:
-                account.getCollection().getDecks().add(Deck.getDefaultMode2deck());
-                account.getCollection().setSelectedDeck(Deck.getDefaultMode2deck());
-                break;
-            case COLLECT_THE_FLAGS:
-                account.getCollection().getDecks().add(Deck.getDefaultMode3deck());
-                account.getCollection().setSelectedDeck(Deck.getDefaultMode3deck());
-                break;
-        }
+        account.getCollection().getDecks().add(Deck.getDefaultMode1deck());
+        account.getCollection().setSelectedDeck(Deck.getDefaultMode1deck());
         return account;
     }
 

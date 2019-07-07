@@ -87,33 +87,9 @@ public class BattleMenuController implements Initializable {
 
     @FXML
     void storyMode(ActionEvent event) {
-        int mode = 0;
-        Button button = (Button) event.getSource();
-        if (button.equals(btnMode1))
-            mode = 1;
-        else if (button.equals(btnMode2))
-            mode = 2;
-        else if (button.equals(btnMode3))
-            mode = 3;
-        Account playerAI;
-        Match match;
-        switch (mode) {
-            case 1:
-                playerAI = Account.getAIAccount(MatchType.KILL_THE_HERO);
-                match = new Match(MatchType.KILL_THE_HERO, account, playerAI);
-                BattleController.getInstance().mainBattleController(match);
-                break;
-            case 2:
-                playerAI = Account.getAIAccount(MatchType.HOLD_THE_FLAG);
-                match = new Match(MatchType.HOLD_THE_FLAG, account, playerAI);
-                BattleController.getInstance().mainBattleController(match);
-                break;
-            case 3:
-                playerAI = Account.getAIAccount(MatchType.COLLECT_THE_FLAGS);
-                match = new Match(6, account, playerAI);
-                BattleController.getInstance().mainBattleController(match);
-                break;
-        }
+        Account playerAI = Account.getAIAccount();
+        Match match = new Match(account, playerAI);
+        BattleController.getInstance().mainBattleController(match);
     }
 
     @FXML
@@ -207,11 +183,11 @@ public class BattleMenuController implements Initializable {
         else {
             if (request.getMode().equals(MatchType.COLLECT_THE_FLAGS)) {
 
-                Match match = new Match(request.getNumberOfFlags(), account, player2);
+                Match match = new Match(account, player2);
                 BattleController.getInstance().mainBattleController(match);
                 return;
             } else {
-                Match match = new Match(request.getMode(), account, player2);
+                Match match = new Match(account, player2);
                 BattleController.getInstance().mainBattleController(match);
 
             }

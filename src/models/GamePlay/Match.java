@@ -8,9 +8,8 @@ public class Match {
 
     Table table = new Table();
     Account player1, player2;
-    GraveYard Player1GraveYard = new GraveYard();
-    GraveYard Player2GraveYard = new GraveYard();
-    private MatchType matchType;
+    private GraveYard Player1GraveYard = new GraveYard();
+    private GraveYard Player2GraveYard = new GraveYard();
     private GameLogic gameLogic;
     int turnNumber = 1;
     int player1Mana = 2, player2Mana = 2;
@@ -26,10 +25,6 @@ public class Match {
 
     public Table getTable() {
         return table;
-    }
-
-    public MatchType getMatchType() {
-        return matchType;
     }
 
     public GameLogic getGameLogic() {
@@ -56,30 +51,14 @@ public class Match {
         return turnNumber;
     }
 
-    public Match(MatchType matchType, Account player1, Account player2) {
+    public Match(Account player1, Account player2) {
 
-        //Constructor for "kill the hero" and "hold the flag"
-        this.matchType = matchType;
         this.player1 = player1;
         this.player2 = player2;
         gameLogic = new GameLogic(this);
 
         initializePlayerVariables();
-        if (matchType == MatchType.KILL_THE_HERO) initializeTableModeKillTheHero();
-        else initializeTableModeHoldTheFlag();
-    }
-
-    public Match(int flagsNumber, Account player1, Account player2) {
-
-        //Constructor for "collect the flag"
-        matchType = MatchType.COLLECT_THE_FLAGS;
-        this.player1 = player1;
-        this.player2 = player2;
-        gameLogic = new GameLogic(this);
-        gameLogic.flagsNumber = flagsNumber;
-
-        initializePlayerVariables();
-        initializeTableModeCollectTheFlag(flagsNumber);
+        initializeTableModeKillTheHero();
     }
 
     public Account findPlayerPlayingThisTurn() {
@@ -114,47 +93,5 @@ public class Match {
 
         player1.getHand().initializeHand(player1.getCollection().getSelectedDeck());
         player2.getHand().initializeHand(player2.getCollection().getSelectedDeck());
-    }
-
-    private void initializeTableModeHoldTheFlag() {
-
-        //for put hero on table
-        initializeTableModeKillTheHero();
-
-        Card flag = new Card(
-                0, 0, "flag", null, "", CardType.FLAG, table.getCells()[2][4]);
-        table.getCells()[2][4].setFlag(flag);
-    }
-
-    private void initializeTableModeCollectTheFlag(int numberOfFlags) {
-
-        //for put hero on table
-        initializeTableModeKillTheHero();
-
-        Random random = new Random();
-
-        int[] randomRow = new int[numberOfFlags], randomColumn = new int[numberOfFlags];
-
-        for (int i = 0; i < numberOfFlags; i++) {
-
-            randomColumn[i] = random.nextInt(9);
-            randomRow[i] = random.nextInt(5);
-
-            for (int j = 0; j < i; j++) {
-                if (randomColumn[i] == randomColumn[j] && randomRow[i] == randomRow[j]) {
-                    i--;
-                    break;
-                } else if ((randomColumn[i] == 8 || randomColumn[i] == 0) && randomRow[i] == 2) {
-                    i--;
-                    break;
-                }
-            }
-        }
-
-        for (int i = 0; i < numberOfFlags; i++) {
-            Card flag = new Card(0, 0, "flag_" + i + 1, null,
-                    "", CardType.FLAG, table.getCells()[randomRow[i]][randomColumn[i]]);
-            table.getCells()[randomRow[i]][randomColumn[i]].setFlag(flag);
-        }
     }
 }

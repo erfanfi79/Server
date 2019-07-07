@@ -90,17 +90,7 @@ public class GameLogic {
             if (card instanceof Unit)
                 player2Units.add((Unit) card);
 
-
-        if (match.getMatchType() == MatchType.KILL_THE_HERO)
-            return getMatchResultForKillTheHero();
-
-        else if (match.getMatchType() == MatchType.HOLD_THE_FLAG)
-            return getMatchResultForHoldTheFlag();
-
-        else if (match.getMatchType() == MatchType.COLLECT_THE_FLAGS)
-            return getMatchResultForCollectTheFlags();
-
-        return MATCH_HAS_NOT_ENDED;
+        return getMatchResultForKillTheHero();
     }
 
     private int getMatchResultForKillTheHero() {
@@ -118,79 +108,6 @@ public class GameLogic {
             return PLAYER1_WINS;
         }
 
-        return MATCH_HAS_NOT_ENDED;
-    }
-
-    private int getMatchResultForHoldTheFlag() {
-        getMatchResultForKillTheHero();
-        Cell[][] cells = match.getTable().getCells();
-
-        for (Cell[] row : cells) {
-            for (Cell cell : row) {
-                if (cell.getFlag() != null && cell.getCard() != null) {
-                    if (cardOnFlag.equals("")){
-                        cardOnFlag = cell.getCard().getCardID();
-
-                    }
-                    else{
-                        if (cardOnFlag.equals( cell.getCard().getCardID())){
-                            if (cell.getCard().getTeam().equals(match.player1.getUserName()))
-                                turnsHavingFlagPlayer1++;
-
-                            else turnsHavingFlagPlayer2++;
-                        }
-                        else{
-                            cardOnFlag = cell.getCard().getCardID();
-                            turnsHavingFlagPlayer1 = 0;
-                            turnsHavingFlagPlayer2 = 0;
-                            if (cell.getCard().getTeam().equals(match.player1.getUserName()))
-                                turnsHavingFlagPlayer1++;
-
-                            else turnsHavingFlagPlayer2++;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (turnsHavingFlagPlayer1 >= NUMBER_OF_TURNS_TO_HOLD_THE_FLAG) {
-            BattleController.getInstance().setIsEndedGame(1);
-            return PLAYER1_WINS;
-        }
-        if (turnsHavingFlagPlayer2 >= NUMBER_OF_TURNS_TO_HOLD_THE_FLAG) {
-            BattleController.getInstance().setIsEndedGame(2);
-            return PLAYER2_WINS;
-        }
-
-        return MATCH_HAS_NOT_ENDED;
-    }
-
-    private int getMatchResultForCollectTheFlags() {
-        getMatchResultForKillTheHero();
-        Cell[][] cells = match.getTable().getCells();
-        int player1Flag = 0, player2Flag = 0;
-
-        for (Cell[] row : cells) {
-            for (Cell cell : row) {
-
-                if (cell.getFlag() != null && cell.getCard() != null) {
-
-                    if (cell.getCard().getTeam().equals(match.player1.getUserName()))
-                        player1Flag++;
-
-                    else player2Flag++;
-                }
-            }
-        }
-
-        if (player1Flag >= Math.ceil(NUMBER_OF_TURNS_TO_HOLD_THE_FLAG / 2) + 1) {
-            BattleController.getInstance().setIsEndedGame(1);
-            return PLAYER1_WINS;
-        }
-        if (player2Flag >= Math.ceil(NUMBER_OF_TURNS_TO_HOLD_THE_FLAG / 2) + 1) {
-            BattleController.getInstance().setIsEndedGame(2);
-            return PLAYER2_WINS;
-        }
         return MATCH_HAS_NOT_ENDED;
     }
 
