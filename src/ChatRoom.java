@@ -25,7 +25,7 @@ public class ChatRoom {
     public synchronized void sendMassage(ClientThread clientThread, ClientChatRoomPacket clientChatRoomPacket) {
 
         massages.add(new Massage(clientThread.getAccount().getUserName(), clientChatRoomPacket.getString()));
-        sendMassagesToClient(clientThread);
+        sendMassagesToClients();
     }
 
     public void sendMassagesToClient(ClientThread clientThread) {
@@ -35,6 +35,7 @@ public class ChatRoom {
 
     public void sendMassagesToClients() {
 
-
+        for (ClientThread clientThread : Server.getUsersInChatRoom())
+            clientThread.sendPacketToClient(new ServerChatRoomPacket(massages));
     }
 }
