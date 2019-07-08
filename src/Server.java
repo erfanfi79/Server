@@ -9,6 +9,7 @@ public class Server {
 
     private static LinkedList<ClientThread> onlineUsers = new LinkedList<>();
     private static LinkedList<ClientThread> waitersForMultiPlayerGame = new LinkedList<>();
+    private static LinkedList<ClientThread> usersInChatRoom = new LinkedList<>();
 
     public static LinkedList<ClientThread> getOnlineUsers() {
         return onlineUsers;
@@ -16,6 +17,10 @@ public class Server {
 
     public static LinkedList<ClientThread> getWaitersForMultiPlayerGame() {
         return waitersForMultiPlayerGame;
+    }
+
+    public static LinkedList<ClientThread> getUsersInChatRoom() {
+        return usersInChatRoom;
     }
 
     public static void main(String[] args) throws IOException {

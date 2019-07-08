@@ -1,12 +1,10 @@
 package packet.serverPacket;
 
-import models.ChatRoom.Massage;
-
 import java.util.ArrayList;
 
-public class ServerChatRoomPacket {
+public class ServerChatRoomPacket extends ServerPacket {
 
-    private ArrayList<Massage> massages = new ArrayList<>();
+    private ArrayList<Massage> massages;
 
     public ArrayList<Massage> getMassages() {
         return massages;

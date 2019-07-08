@@ -1,4 +1,4 @@
-package models.ChatRoom;
+package packet.serverPacket;
 
 public class Massage {
 
@@ -12,7 +12,7 @@ public class Massage {
         return massage;
     }
 
-    Massage(String userName, String massage) {
+    public Massage(String userName, String massage) {
 
         this.userName = userName;
         this.massage = massage;

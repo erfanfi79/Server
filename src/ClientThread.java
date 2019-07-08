@@ -1,5 +1,4 @@
 import models.Account;
-import models.ChatRoom.ChatRoom;
 import models.Collection;
 import models.JsonToCard;
 import models.LoginMenu;
@@ -52,7 +51,7 @@ public class ClientThread extends Thread {
                     enumPacketHandler((ClientEnumPacket) packet);
 
                 else if (packet instanceof ClientChatRoomPacket)
-                    ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet, objectOutputStream);
+                    ChatRoom.getInstance().sendMassage(this, (ClientChatRoomPacket) packet);
 
                 else if (packet instanceof ClientLoginPacket)
                     accountMenu((ClientLoginPacket) packet);
@@ -71,7 +70,8 @@ public class ClientThread extends Thread {
         switch (clientEnumPacket.getPacket()) {
 
             case CHAT_ROOM:
-                ChatRoom.getInstance().sendMassagesToClient(objectOutputStream);
+                Server.getUsersInChatRoom().add(this);  //todo remove user from arrayList
+                ChatRoom.getInstance().sendMassagesToClient(this);
                 break;
 
             case GET_MONEY:
