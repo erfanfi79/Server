@@ -1,7 +1,4 @@
-import models.Account;
-import models.Collection;
-import models.JsonToCard;
-import models.LoginMenu;
+import models.*;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
 import packet.clientPacket.clientMatchPacket.ClientInsertCardPacket;
@@ -76,7 +73,6 @@ public class ClientThread extends Thread {
         switch (clientEnumPacket.getPacket()) {
 
             case CHAT_ROOM:
-                Server.getUsersInChatRoom().add(this);  //todo remove user from arrayList
                 ChatRoom.getInstance().sendMassagesToClient(this);
                 break;
 
