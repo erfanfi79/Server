@@ -1,4 +1,3 @@
-import models.Collection;
 import models.*;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
@@ -10,7 +9,9 @@ import serverHandler.LoginHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ClientThread extends Thread {
 
@@ -65,14 +66,13 @@ public class ClientThread extends Thread {
     }
 
     private void enumPacketHandler(ClientEnumPacket clientEnumPacket) {
-
-        switch (clientEnumPacket.getPacket()) {
+        switch (clientEnumPacket.getPart()) {
 
             case CHAT_ROOM:
                 ChatRoom.getInstance().addToChatRoom(this);
                 break;
 
-            case EXIT_CHAT_ROOM:
+            case EXIT_CHATROOM:
                 ChatRoom.getInstance().removeFromChatRoom(this);
                 break;
 
