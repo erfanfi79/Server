@@ -19,25 +19,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static packet.serverPacket.ServerEnum.MULTI_PLAYER_GAME_IS_READY;
-
 public class ClientThread extends Thread {
 
     private Account account;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
-    private Socket socket;
-    private MatchManager matchManager;      //todo see that is this necessary?
-
-    private boolean isPlaying = false;
+    private MatchManager matchManager;
 
     public Account getAccount() {
         return account;
     }
 
     public ClientThread(Socket socket) {
-
-        this.socket = socket;
 
         try {
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
