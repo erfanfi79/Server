@@ -1,6 +1,8 @@
 package packet.clientPacket;
 
-public enum ClientEnum {
+import java.io.Serializable;
+
+public enum ClientEnum implements Serializable {
 
     CHAT_ROOM,
     LEADER_BOARD,

@@ -120,7 +120,7 @@ public class Account implements Serializable {
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             // write object to file
             oos.writeObject(account);
-            System.out.println("Done");
+            System.out.println(account.getUserName() + " Account Saved");
             // closing resources
             oos.close();
             fos.close();

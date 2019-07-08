@@ -2,7 +2,6 @@ package models;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class LoginMenu {
     private static ArrayList<Account> users = new ArrayList<Account>();
@@ -54,16 +53,23 @@ public class LoginMenu {
         return null;
     }
 
-    private static void initializeUsers() {
-        try {
-            File file = new File("listOfUserName.txt");
-            Scanner sc = new Scanner(file);
+    private static File[] getFileList(String dirPath) {
+        File dir = new File(dirPath);
 
-            while (sc.hasNextLine()) {
-                String userName = sc.nextLine();
+        File[] fileList = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".ser");
+            }
+        });
+        return fileList;
+    }
+    private static void initializeUsers() {
+        File[] fileList = getFileList("users");
+
+        for (File file : fileList) {
                 Account account = null;
                 try {
-                    FileInputStream is = new FileInputStream("users/" + userName + ".ser");
+                    FileInputStream is = new FileInputStream("users/" + file.getName() + ".ser");
                     ObjectInputStream ois = new ObjectInputStream(is);
                     account = (Account) ois.readObject();
                     users.add(account);
@@ -75,9 +81,6 @@ public class LoginMenu {
                     e.printStackTrace();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static ArrayList<Account> getUsers() {

@@ -1,6 +1,8 @@
 package packet.serverPacket;
 
-public enum  ServerEnum {
+import java.io.Serializable;
+
+public enum ServerEnum implements Serializable {
 
     MULTI_PLAYER_GAME_IS_READY,
     MATCH_ENDED
