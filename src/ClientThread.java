@@ -66,14 +66,13 @@ public class ClientThread extends Thread {
     }
 
     private void enumPacketHandler(ClientEnumPacket clientEnumPacket) {
-
-        switch (clientEnumPacket.getPacket()) {
+        switch (clientEnumPacket.getPart()) {
 
             case CHAT_ROOM:
                 ChatRoom.getInstance().addToChatRoom(this);
                 break;
 
-            case EXIT_CHAT_ROOM:
+            case EXIT_CHATROOM:
                 ChatRoom.getInstance().removeFromChatRoom(this);
                 break;
 

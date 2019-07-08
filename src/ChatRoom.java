@@ -30,7 +30,7 @@ public class ChatRoom {
     }
 
     public synchronized void sendMassage(Account account, ClientChatRoomPacket clientChatRoomPacket) {
-
+        System.out.println(clientChatRoomPacket.getString());
         massages.add(new Massage(account.getUserName(), clientChatRoomPacket.getString()));
         sendToAll();
 
