@@ -26,8 +26,7 @@ public class Server {
 
             System.err.println("Waiting for connect a client ...");
 
-            ClientThread clientThread = new ClientThread(serverSocket.accept());
-            clientThread.start();
+            onlineUsers.add(new ClientThread(serverSocket.accept()));
             //todo delete from online users if exception
 
             System.err.println("Client connected");

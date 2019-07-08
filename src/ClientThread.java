@@ -31,6 +31,14 @@ public class ClientThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        try {
+            start();
+        } catch (Exception e) {
+
+            Server.getOnlineUsers().remove(this);
+            e.printStackTrace();
+        }
     }
 
     public Account getAccount() {
