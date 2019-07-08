@@ -8,6 +8,7 @@ import packet.serverPacket.serverMatchPacket.*;
 import view.battleView.BattleLog;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static packet.serverPacket.ServerEnum.MATCH_ENDED;
 import static packet.serverPacket.ServerEnum.MULTI_PLAYER_GAME_IS_READY;
@@ -65,6 +66,7 @@ public class MatchManager {
 
         if (!isMoveRequestValid(client, card, destinationCell)) return;
         gameLogic.moveProcess(card, destinationCell);
+        sendMovePacketToClients((Unit) card, start, destination);
     }
 
     private boolean isMoveRequestValid(ClientThread client, Card card, Cell destinationCell) {
@@ -104,6 +106,7 @@ public class MatchManager {
 
         if (!isAttackRequestValid(client, attacker, defender)) return;
         gameLogic.attack(attacker, defender);
+        sendAttackPacketToClients(attacker, attackerCoordination);
     }
 
     private boolean isAttackRequestValid(ClientThread client, Unit attacker, Unit defender) {
@@ -198,8 +201,14 @@ public class MatchManager {
 
 
     public void endTurn() {
+
         gameLogic.switchTurn();
-        //todo if match is single player play AI
+
+        if (clientThread2.getAccount().isAI()) {
+            sendMatchInfoToClients();
+            playAI();
+            gameLogic.switchTurn();
+        }
     }
 
 
@@ -283,8 +292,8 @@ public class MatchManager {
 
         ServerAttackPacket serverAttackPacket = new ServerAttackPacket(getVirtualCard(card), coordination);
         clientThread1.sendPacketToClient(serverAttackPacket);
+        clientThread2.sendPacketToClient(serverAttackPacket);
     }
-
 
 
     /*
@@ -417,5 +426,46 @@ public class MatchManager {
     private VirtualCard getVirtualCard(Unit card) {
         return new VirtualCard(
                 card.getCardName(), card.getManaCost(), card.getHealthPoint(), card.getAttackPoint());
+    }
+
+    private void playAI() {
+
+        Card hero = match.getPlayer2().getHand().getHero();
+
+        ArrayList<Integer> rows = new ArrayList<>();
+        rows.add(-2);
+        rows.add(-1);
+        rows.add(0);
+        rows.add(1);
+        rows.add(2);
+        Collections.shuffle(rows);
+
+        for (Integer row : rows) {
+            for (int column = -2 + Math.abs(row); column <= 2 - Math.abs(row); column++) {
+
+                if (row == 0 && column == 0) continue;
+
+                try {
+                    Coordination heroCoordination = hero.getCell().getCoordination();
+                    Coordination destinationCoordination = Coordination.getNewCoordination(
+                            heroCoordination.getRow() + row, heroCoordination.getColumn() + column);
+                    Cell destinationCell = match.getTable().getCellByCoordination(destinationCoordination);
+
+                    //check validity of destination
+                    if (!isCellAvailableForMove(hero.getCell(), destinationCell)) continue;
+                    if (isUnitStunned((Unit) hero)) continue;
+                    if (isAttackedPreviously(hero)) continue;
+                    if (isMovedPreviously(hero)) continue;
+                    if (isDirectionWithoutEnemyForMove(hero.getCell(), destinationCell))
+                        continue;
+
+                    //move
+                    gameLogic.moveProcess(hero, destinationCell);
+                    sendMovePacketToClients((Unit) hero, heroCoordination, destinationCoordination);
+
+                } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+                }
+            }
+        }
     }
 }

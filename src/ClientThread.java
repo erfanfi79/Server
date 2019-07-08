@@ -1,3 +1,4 @@
+import models.Collection;
 import models.*;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
@@ -9,64 +10,56 @@ import serverHandler.LoginHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 public class ClientThread extends Thread {
 
     private Account account;
-    private ObjectOutputStream objectOutputStream;
-    private ObjectInputStream objectInputStream;
+    private InputStreamReader inputStreamReader;
+    private OutputStreamWriter outputStreamWriter;
     private Socket socket;
     private MatchManager matchManager;      //todo see that is this necessary?
-
-    public Account getAccount() {
-        return account;
-    }
 
     public ClientThread(Socket socket) {
 
         this.socket = socket;
 
         try {
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
-
+            inputStreamReader = new InputStreamReader(socket.getInputStream());
+            outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Account getAccount() {
+        return account;
     }
 
     @Override
     public void run() {
 
         while (true) {
-            try {
-                ClientPacket packet = (ClientPacket) objectInputStream.readObject();
+            ClientPacket packet = getPacketFromClient();
 
-                if (packet instanceof ClientEnumPacket)
-                    enumPacketHandler((ClientEnumPacket) packet);
+            if (packet instanceof ClientEnumPacket)
+                enumPacketHandler((ClientEnumPacket) packet);
 
-                else if (packet instanceof ClientChatRoomPacket)
-                    ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
+            else if (packet instanceof ClientChatRoomPacket)
+                ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
 
-                else if (packet instanceof ClientLoginPacket)
-                    accountMenu((ClientLoginPacket) packet);
+            else if (packet instanceof ClientLoginPacket)
+                accountMenu((ClientLoginPacket) packet);
 
-                else if (packet instanceof ClientStartMatchPacket)
-                    startMatchPacketHandler((ClientStartMatchPacket) packet);
+            else if (packet instanceof ClientStartMatchPacket)
+                startMatchPacketHandler((ClientStartMatchPacket) packet);
 
-                else if (packet instanceof ClientBuyAndSellPacket)
-                    buyAndSell((ClientBuyAndSellPacket) packet);
+            else if (packet instanceof ClientBuyAndSellPacket)
+                buyAndSell((ClientBuyAndSellPacket) packet);
 
-                else if (packet instanceof ClientCollectionPacket) {
-                    account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
-                    Account.save(account);
-                }
-
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+            else if (packet instanceof ClientCollectionPacket) {
+                account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
+                Account.save(account);
             }
         }
     }
@@ -175,29 +168,26 @@ public class ClientThread extends Thread {
         //todo pay attention to turn for who
 
         while (true) {
-            try {
-                ClientPacket packet = (ClientPacket) objectInputStream.readObject();
+            ClientPacket packet = getPacketFromClient();
 
-                if (packet instanceof ClientMovePacket)
-                    matchManager.move(this, ((ClientMovePacket) packet).getStartCoordination(),
-                            ((ClientMovePacket) packet).getDestinationCoordination());
+            if (packet instanceof ClientMovePacket)
+                matchManager.move(this, ((ClientMovePacket) packet).getStartCoordination(),
+                        ((ClientMovePacket) packet).getDestinationCoordination());
 
-                else if (packet instanceof ClientAttackPacket)
-                    matchManager.attack(this, ((ClientAttackPacket) packet).getAttackerCoordination(),
-                            ((ClientAttackPacket) packet).getDefenderCoordination());
+            else if (packet instanceof ClientAttackPacket)
+                matchManager.attack(this, ((ClientAttackPacket) packet).getAttackerCoordination(),
+                        ((ClientAttackPacket) packet).getDefenderCoordination());
 
-                else if (packet instanceof ClientInsertCardPacket)
-                    matchManager.insert(this, ((ClientInsertCardPacket) packet).getWhichHandCard(),
-                            ((ClientInsertCardPacket) packet).getCoordination());
+            else if (packet instanceof ClientInsertCardPacket)
+                matchManager.insert(this, ((ClientInsertCardPacket) packet).getWhichHandCard(),
+                        ((ClientInsertCardPacket) packet).getCoordination());
 
-                else if (packet instanceof ClientMatchEnumPacket)
-                    matchEnumInputHandler((ClientMatchEnumPacket) packet);
+            else if (packet instanceof ClientMatchEnumPacket)
+                matchEnumInputHandler((ClientMatchEnumPacket) packet);
 
-                if (matchManager.isMatchFinished()) break;
+            matchManager.sendMatchInfoToClients();
 
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            if (matchManager.isMatchFinished()) break;
         }
     }
 
@@ -232,13 +222,27 @@ public class ClientThread extends Thread {
         sendPacketToClient(serverLogPacket);
     }
 
+    public ClientPacket getPacketFromClient() {
+
+        try {
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            return YaGsonChanger.readClientPacket(bufferedReader.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public void sendPacketToClient(ServerPacket serverPacket) {
 
         try {
-            objectOutputStream.reset();
-            objectOutputStream.writeObject(serverPacket);
-            objectOutputStream.flush();
-        } catch (Exception e) {
+            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+            bufferedWriter.write(YaGsonChanger.write(serverPacket));
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
