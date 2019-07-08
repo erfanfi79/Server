@@ -227,11 +227,11 @@ public class ClientThread extends Thread {
         try {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             return YaGsonChanger.readClientPacket(bufferedReader.readLine());
+
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
     public void sendPacketToClient(ServerPacket serverPacket) {
