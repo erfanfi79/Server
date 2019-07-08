@@ -1,4 +1,3 @@
-import models.Collection;
 import models.*;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
@@ -10,7 +9,9 @@ import serverHandler.LoginHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ClientThread extends Thread {
 
