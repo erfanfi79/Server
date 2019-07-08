@@ -10,9 +10,7 @@ import packet.clientPacket.clientMatchPacket.ClientMovePacket;
 import packet.serverPacket.*;
 import serverHandler.LoginHandler;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +56,14 @@ public class ClientThread extends Thread {
 
                 else if (packet instanceof ClientStartMatchPacket)
                     startMatchPacketHandler((ClientStartMatchPacket) packet);
+
+                else if (packet instanceof ClientBuyAndSellPacket)
+                    buyAndSell((ClientBuyAndSellPacket) packet);
+
+                else if (packet instanceof ClientCollectionPacket) {
+                    account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
+                    Account.save(account);
+                }
 
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -108,7 +114,7 @@ public class ClientThread extends Thread {
 
     private void sendMatchHistory() {
 
-        ServerMatchHistory historyPacket=new ServerMatchHistory();
+        ServerMatchHistory historyPacket = new ServerMatchHistory();
         historyPacket.setHistories(account.getMatchHistories());
         sendPacketToClient(historyPacket);
     }
@@ -231,14 +237,63 @@ public class ClientThread extends Thread {
         }
     }
 
+    public void buyAndSell(ClientBuyAndSellPacket packet) {
+        if (packet.isBuy()) {
+            ShopError error = GlobalShop.getGlobalShop().buy(packet.getCardName(), account);
+            ServerLogPacket serverLogPacket = new ServerLogPacket();
+            if (error.equals(ShopError.SUCCESS))
+                serverLogPacket.setSuccessful(true);
+            else serverLogPacket.setLog(error.toString());
+
+        } else sell(packet.getCardName());
+        enterShop();
+    }
+
+    public void sell(String cardName) {
+        ArrayList<Card> cards = account.getCollection().getCards();
+        for (int i = cards.size() - 1; i >= 0; i--)
+            if (cards.get(i).getCardName().equals(cardName)) {
+                Card soldCard = cards.get(i);
+                account.setMoney(account.getMoney() + (soldCard.getPrice() * 3) / 4);
+                ServerMoneyPacket serverMoneyPacket = new ServerMoneyPacket();
+                serverMoneyPacket.setMoney(account.getMoney());
+                sendPacketToClient(serverMoneyPacket);
+                account.getCollection().getCards().remove(soldCard);
+                GlobalShop.getGlobalShop().addToShop(cardName);
+                ServerLogPacket serverLogPacket = new ServerLogPacket();
+                serverLogPacket.setSuccessful(true);
+                sendPacketToClient(serverLogPacket);
+                return;
+            }
+        ServerLogPacket serverLogPacket = new ServerLogPacket();
+        serverLogPacket.setLog(ShopError.CARD_NOT_FOUND.toString());
+        sendPacketToClient(serverLogPacket);
+    }
+
     private void enterShop() {
-        Collection collection = JsonToCard.initializeShopCollection();
-        sendPacketToClient(new ServerCollection(account.getCollection(), collection));
+        Collection collection = GlobalShop.getGlobalShop().getShopCollection();
+        sendPacketToClient(new ServerCollection(getNewCollection(), collection));
+        ServerMoneyPacket serverMoneyPacket = new ServerMoneyPacket();
+        serverMoneyPacket.setMoney(account.getMoney());
+        sendPacketToClient(serverMoneyPacket);
     }
 
     private void enterCollection() {
-        sendPacketToClient(new ServerCollection(account.getCollection()));
+        sendPacketToClient(new ServerCollection(getNewCollection()));
     }
 
+    private Collection getNewCollection() {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(account.getCollection());
+            ByteArrayInputStream bais = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            ObjectInputStream objectInputStream = new ObjectInputStream(bais);
+            return (Collection) objectInputStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }

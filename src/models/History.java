@@ -11,6 +11,7 @@ public class History implements Serializable {
 
     public void setLocalDateTime() {
         localDateTime = LocalDateTime.now();
+
     }
 
     public void setYourStatus(GameStatus yourStatus) {

@@ -14,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import models.*;
-import view.shopMenuView.ShopError;
 
 import java.io.IOException;
 import java.net.URL;
