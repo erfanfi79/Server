@@ -237,7 +237,7 @@ public class ClientThread extends Thread {
         try {
             objectOutputStream.writeObject(serverPacket);
             objectOutputStream.flush();
-            objectOutputStream.reset();
+            // objectOutputStream.reset();
         } catch (Exception e) {
             e.printStackTrace();
         }

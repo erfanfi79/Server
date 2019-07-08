@@ -69,7 +69,7 @@ public class LoginMenu {
         for (File file : fileList) {
                 Account account = null;
                 try {
-                    FileInputStream is = new FileInputStream("users/" + file.getName() + ".ser");
+                    FileInputStream is = new FileInputStream("users/" + file.getName());
                     ObjectInputStream ois = new ObjectInputStream(is);
                     account = (Account) ois.readObject();
                     users.add(account);
