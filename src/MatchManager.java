@@ -4,10 +4,7 @@ import models.GamePlay.Match;
 import models.GamePlay.MatchResult;
 import packet.serverPacket.ServerEnumPacket;
 import packet.serverPacket.ServerLogPacket;
-import packet.serverPacket.serverMatchPacket.ServerGraveYardPacket;
-import packet.serverPacket.serverMatchPacket.ServerMatchInfoPacket;
-import packet.serverPacket.serverMatchPacket.ServerPlayersUserNamePacket;
-import packet.serverPacket.serverMatchPacket.VirtualCard;
+import packet.serverPacket.serverMatchPacket.*;
 import view.battleView.BattleLog;
 
 import java.util.ArrayList;
@@ -50,18 +47,11 @@ public class MatchManager {
         Cell[][] cells = match.getTable().getCells();
         VirtualCard[][] table = new VirtualCard[5][9];
 
-        for (int row = 0; row < 5; row++) {
-            for (int column  = 0; column < 9; column++) {
-                if (cells[row][column] != null) {
+        for (int row = 0; row < 5; row++)
+            for (int column  = 0; column < 9; column++)
+                if (cells[row][column] != null)
+                    table[row][column] = getVirtualCard((Unit) cells[row][column].getCard());
 
-                    Unit card = (Unit) cells[row][column].getCard();
-                    VirtualCard virtualCard = new VirtualCard(
-                            card.getCardName(), card.getManaCost(), card.getHealthPoint(), card.getAttackPoint());
-
-                    table[row][column] = virtualCard;
-                }
-            }
-        }
         packet.setTable(table, match.getPlayer1Mana(), match.getPlayer2Mana());
 
         clientThread1.sendPacketToClient(packet);
@@ -282,6 +272,19 @@ public class MatchManager {
         client.sendPacketToClient(serverLogPacket);
     }
 
+    private void sendMovePacketToClients(Unit card, Coordination start, Coordination destination) {
+
+        ServerMovePacket serverMovePacket = new ServerMovePacket(getVirtualCard(card), start, destination);
+        clientThread1.sendPacketToClient(serverMovePacket);
+        clientThread2.sendPacketToClient(serverMovePacket);
+    }
+
+    private void sendAttackPacketToClients(Unit card, Coordination coordination) {
+
+        ServerAttackPacket serverAttackPacket = new ServerAttackPacket(getVirtualCard(card), coordination);
+        clientThread1.sendPacketToClient(serverAttackPacket);
+    }
+
 
 
     /*
@@ -409,5 +412,10 @@ public class MatchManager {
 
         BattleLog.errorCellNotAvailable();
         return false;
+    }
+
+    private VirtualCard getVirtualCard(Unit card) {
+        return new VirtualCard(
+                card.getCardName(), card.getManaCost(), card.getHealthPoint(), card.getAttackPoint());
     }
 }

@@ -12,5 +12,5 @@ public enum ClientEnum implements Serializable {
     GET_MONEY,
     SAVE,
     CANCEL_WAITING_FOR_MULTI_PLAYER_GAME,
-    EXIT_CHATROOM,
+    EXIT_CHAT_ROOM,
 }

@@ -1,8 +1,9 @@
 package packet.serverPacket.serverMatchPacket;
 
 import models.Coordination;
+import packet.serverPacket.ServerPacket;
 
-public class ServerMovePacket {
+public class ServerMovePacket extends ServerPacket {
 
     private VirtualCard card;
     private Coordination start, destination;

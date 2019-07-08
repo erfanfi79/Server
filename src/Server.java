@@ -28,6 +28,7 @@ public class Server {
 
             ClientThread clientThread = new ClientThread(serverSocket.accept());
             clientThread.start();
+            //todo delete from online users if exception
 
             System.err.println("Client connected");
         }

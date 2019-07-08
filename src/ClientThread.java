@@ -79,7 +79,7 @@ public class ClientThread extends Thread {
                 ChatRoom.getInstance().addToChatRoom(this);
                 break;
 
-            case EXIT_CHATROOM:
+            case EXIT_CHAT_ROOM:
                 ChatRoom.getInstance().removeFromChatRoom(this);
                 break;
 
@@ -235,9 +235,9 @@ public class ClientThread extends Thread {
     public void sendPacketToClient(ServerPacket serverPacket) {
 
         try {
+            objectOutputStream.reset();
             objectOutputStream.writeObject(serverPacket);
             objectOutputStream.flush();
-            // objectOutputStream.reset();
         } catch (Exception e) {
             e.printStackTrace();
         }
