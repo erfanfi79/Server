@@ -1,6 +1,6 @@
 package packet.serverPacket;
 
-public class Massage {
+public class Massage extends ServerPacket {
 
     private String userName, massage;
 

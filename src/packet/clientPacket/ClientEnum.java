@@ -10,4 +10,5 @@ public enum ClientEnum {
     GET_MONEY,
     SAVE,
     CANCEL_WAITING_FOR_MULTI_PLAYER_GAME,
+    EXIT_CHATROOM,
 }

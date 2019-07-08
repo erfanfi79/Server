@@ -3,21 +3,13 @@ import packet.clientPacket.ClientChatRoomPacket;
 import packet.serverPacket.Massage;
 import packet.serverPacket.ServerChatRoomPacket;
 
-import java.awt.*;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class ChatRoom {
 
     private static ChatRoom chatRoom;
     private ArrayList<Massage> massages = new ArrayList<>();
-    private static LinkedList<ClientThread> clientThreads = new LinkedList<>();
-
-    public static LinkedList<ClientThread> getClientThreads() {
-        return clientThreads;
-    }
+    ArrayList<ClientThread> clientThreads = new ArrayList<>();
 
     public static ChatRoom getInstance() {
 
@@ -28,20 +20,24 @@ public class ChatRoom {
     private ChatRoom() {
     }
 
-    public synchronized void sendMassage(ClientThread clientThread, ClientChatRoomPacket clientChatRoomPacket) {
-
-        massages.add(new Massage(clientThread.getAccount().getUserName(), clientChatRoomPacket.getString()));
-        sendMassagesToClients();
-    }
-
-    public void sendMassagesToClient(ClientThread clientThread) {
-
+    public void addToChatRoom(ClientThread clientThread) {
+        clientThreads.add(clientThread);
         clientThread.sendPacketToClient(new ServerChatRoomPacket(massages));
     }
 
-    public void sendMassagesToClients() {
+    public void removeFromChatRoom(ClientThread clientThread) {
+        clientThreads.remove(clientThread);
+    }
 
-        for (ClientThread clientThread : clientThreads)
-            clientThread.sendPacketToClient(new ServerChatRoomPacket(massages));
+    public synchronized void sendMassage(Account account, ClientChatRoomPacket clientChatRoomPacket) {
+
+        massages.add(new Massage(account.getUserName(), clientChatRoomPacket.getString()));
+        sendToAll();
+
+    }
+
+    public void sendToAll() {
+        for (ClientThread thread : clientThreads)
+            thread.sendPacketToClient(new ServerChatRoomPacket(massages));
     }
 }

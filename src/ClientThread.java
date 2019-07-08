@@ -18,13 +18,16 @@ public class ClientThread extends Thread {
     private Account account;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
-    private MatchManager matchManager;
+    private Socket socket;
+    private MatchManager matchManager;      //todo see that is this necessary?
 
     public Account getAccount() {
         return account;
     }
 
     public ClientThread(Socket socket) {
+
+        this.socket = socket;
 
         try {
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -46,7 +49,7 @@ public class ClientThread extends Thread {
                     enumPacketHandler((ClientEnumPacket) packet);
 
                 else if (packet instanceof ClientChatRoomPacket)
-                    ChatRoom.getInstance().sendMassage(this, (ClientChatRoomPacket) packet);
+                    ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
 
                 else if (packet instanceof ClientLoginPacket)
                     accountMenu((ClientLoginPacket) packet);
@@ -73,8 +76,11 @@ public class ClientThread extends Thread {
         switch (clientEnumPacket.getPacket()) {
 
             case CHAT_ROOM:
-                ChatRoom.getClientThreads().add(this);
-                ChatRoom.getInstance().sendMassagesToClient(this);
+                ChatRoom.getInstance().addToChatRoom(this);
+                break;
+
+            case EXIT_CHATROOM:
+                ChatRoom.getInstance().removeFromChatRoom(this);
                 break;
 
             case GET_MONEY:
@@ -106,6 +112,7 @@ public class ClientThread extends Thread {
             case COLLECTION:
                 enterCollection();
                 break;
+
         }
     }
 
@@ -229,6 +236,8 @@ public class ClientThread extends Thread {
 
         try {
             objectOutputStream.writeObject(serverPacket);
+            objectOutputStream.flush();
+            objectOutputStream.reset();
         } catch (Exception e) {
             e.printStackTrace();
         }
