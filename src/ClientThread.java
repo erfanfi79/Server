@@ -73,6 +73,7 @@ public class ClientThread extends Thread {
         switch (clientEnumPacket.getPacket()) {
 
             case CHAT_ROOM:
+                ChatRoom.getClientThreads().add(this);
                 ChatRoom.getInstance().sendMassagesToClient(this);
                 break;
 
