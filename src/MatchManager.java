@@ -33,7 +33,7 @@ public class MatchManager {
 
         isMultiPlayer = false;
         this.clientThread1 = clientThread1;
-        match = new Match(clientThread1.getAccount(), null);
+        match = new Match(clientThread1.getAccount(), Account.getAIAccount());
         gameLogic = match.getGameLogic();
     }
 

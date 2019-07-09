@@ -111,11 +111,34 @@ public class ClientThread extends Thread {
                 enterCollection();
                 break;
 
+            case CHECK_DECK:
+                checkValidateDeck();
+                break;
+
             case MULTI_PLAYER:
+                break;
 
             case SINGLE_PLAYER:
+                break;
 
         }
+    }
+
+    private void checkValidateDeck() {
+        ServerLogPacket packet = new ServerLogPacket();
+        if (account.getCollection().getSelectedDeck() == null) {
+            packet.setLog("There is no selected deck");
+            sendPacketToClient(packet);
+            return;
+        }
+        if (!account.getCollection().getSelectedDeck().isDeckValidate()) {
+            packet.setLog("Selected Deck is not Valid");
+            sendPacketToClient(packet);
+            return;
+        }
+        packet.setSuccessful(true);
+        saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
+        sendPacketToClient(packet);
     }
 
     private void sendMatchHistory() {
@@ -315,4 +338,19 @@ public class ClientThread extends Thread {
         }
     }
 
+    public void saveDeckInDefaultMode(Deck deck) {
+        try {
+            FileOutputStream fos = new FileOutputStream("defaultDecks/mode1.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            // write object to file
+            oos.writeObject(deck);
+            System.out.println("saved"
+            );
+            // closing resources
+            oos.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,11 +1,12 @@
 package models;
 
 import com.google.gson.Gson;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+//import org.apache.commons.io.FileUtils;
 
 public class ImportExportDeck {
     public static void main(String[] args) throws IOException {
@@ -48,7 +49,7 @@ public class ImportExportDeck {
         File file = new File(deckName);
         Gson gson = new Gson();
         Deck deck = new Deck();
-        String deckString = FileUtils.readFileToString(file);
+        String deckString = "";//FileUtils.readFileToString(file);
         String[] cardStrings = deckString.split("-------");
         for (String cardString : cardStrings) {
             System.out.println(cardString);
