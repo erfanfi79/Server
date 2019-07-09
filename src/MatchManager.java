@@ -19,7 +19,9 @@ public class MatchManager {
     private GameLogic gameLogic;
     private ClientThread clientThread1, clientThread2;
 
-    public MatchManager(ClientThread clientThread1, ClientThread clientThread2) {
+    private boolean isMultiPlayer = true;
+
+    public MatchManager(ClientThread clientThread1, ClientThread clientThread2) {       //multiPlayer
 
         this.clientThread1 = clientThread1;
         this.clientThread2 = clientThread2;
@@ -27,19 +29,32 @@ public class MatchManager {
         gameLogic = match.getGameLogic();
     }
 
+    public MatchManager(ClientThread clientThread1) {       //singlePlayer
+
+        isMultiPlayer = false;
+        this.clientThread1 = clientThread1;
+        match = new Match(clientThread1.getAccount(), null);
+        gameLogic = match.getGameLogic();
+    }
+
     public void sendStartMatchPacketToClients() {
 
         clientThread1.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
-        clientThread2.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
+        if (isMultiPlayer) clientThread2.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
     }
 
     public void sendPlayersNameToClients() {
 
-        ServerPlayersUserNamePacket packet = new ServerPlayersUserNamePacket(clientThread1.getAccount().getUserName(),
-                clientThread2.getAccount().getUserName());
+        ServerPlayersUserNamePacket packet;
+
+        if (isMultiPlayer)
+            packet = new ServerPlayersUserNamePacket(
+                    clientThread1.getAccount().getUserName(), clientThread2.getAccount().getUserName());
+        else
+            packet = new ServerPlayersUserNamePacket(clientThread1.getAccount().getUserName(), "AI");
 
         clientThread1.sendPacketToClient(packet);
-        clientThread2.sendPacketToClient(packet);
+        if (isMultiPlayer) clientThread2.sendPacketToClient(packet);
     }
 
     public void sendMatchInfoToClients() {
@@ -56,7 +71,7 @@ public class MatchManager {
         packet.setTable(table, match.getPlayer1Mana(), match.getPlayer2Mana());
 
         clientThread1.sendPacketToClient(packet);
-        clientThread2.sendPacketToClient(packet);
+        if (isMultiPlayer) clientThread2.sendPacketToClient(packet);
     }
 
     public void move(ClientThread client, Coordination start, Coordination destination) {
@@ -201,13 +216,13 @@ public class MatchManager {
 
 
     public void endTurn() {
-
+        //todo send start your turn enum
         gameLogic.switchTurn();
 
-        if (clientThread2.getAccount().isAI()) {
-            sendMatchInfoToClients();
+        if (!isMultiPlayer) {
             playAI();
             gameLogic.switchTurn();
+            sendMatchInfoToClients();
         }
     }
 
@@ -240,36 +255,36 @@ public class MatchManager {
 
             case DRAW:
                 historyForPlayer1.setYourStatus(GameStatus.DRAW);
-                historyForPlayer2.setYourStatus(GameStatus.DRAW);
+                if (isMultiPlayer) historyForPlayer2.setYourStatus(GameStatus.DRAW);
                 sendServerLogToClient(clientThread1, "GAME DRAW");
-                sendServerLogToClient(clientThread2, "GAME DRAW");
+                if (isMultiPlayer) sendServerLogToClient(clientThread2, "GAME DRAW");
                 break;
 
             case PLAYER1:
                 clientThread1.getAccount().incrementWinsNumber();
                 clientThread1.getAccount().incrementMoney(1000 /*awardOfGame*/);
                 historyForPlayer1.setYourStatus(GameStatus.WIN);
-                historyForPlayer2.setYourStatus(GameStatus.LOST);
+                if (isMultiPlayer) historyForPlayer2.setYourStatus(GameStatus.LOST);
                 sendServerLogToClient(clientThread1, "YOU WIN");
-                sendServerLogToClient(clientThread2, "YOU LOST");
+                if (isMultiPlayer) sendServerLogToClient(clientThread2, "YOU LOST");
                 break;
 
             case PLAYER2:
-                clientThread2.getAccount().incrementWinsNumber();
-                clientThread2.getAccount().incrementMoney(1000 /*awardOfGame*/);
+                if (isMultiPlayer) clientThread2.getAccount().incrementWinsNumber();
+                if (isMultiPlayer) clientThread2.getAccount().incrementMoney(1000 /*awardOfGame*/);
                 historyForPlayer1.setYourStatus(GameStatus.LOST);
-                historyForPlayer2.setYourStatus(GameStatus.WIN);
+                if (isMultiPlayer) historyForPlayer2.setYourStatus(GameStatus.WIN);
                 sendServerLogToClient(clientThread1, "YOU LOST");
-                sendServerLogToClient(clientThread2, "YOU WIN");
+                if (isMultiPlayer) sendServerLogToClient(clientThread2, "YOU WIN");
                 break;
 
         }
 
         clientThread1.getAccount().getMatchHistories().add(historyForPlayer1);
-        clientThread2.getAccount().getMatchHistories().add(historyForPlayer2);
+        if (isMultiPlayer) clientThread2.getAccount().getMatchHistories().add(historyForPlayer2);
 
         clientThread1.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
-        clientThread2.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
+        if (isMultiPlayer) clientThread2.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
         return true;
     }
 
@@ -285,14 +300,14 @@ public class MatchManager {
 
         ServerMovePacket serverMovePacket = new ServerMovePacket(getVirtualCard(card), start, destination);
         clientThread1.sendPacketToClient(serverMovePacket);
-        clientThread2.sendPacketToClient(serverMovePacket);
+        if (isMultiPlayer) clientThread2.sendPacketToClient(serverMovePacket);
     }
 
     private void sendAttackPacketToClients(Unit card, Coordination coordination) {
 
         ServerAttackPacket serverAttackPacket = new ServerAttackPacket(getVirtualCard(card), coordination);
         clientThread1.sendPacketToClient(serverAttackPacket);
-        clientThread2.sendPacketToClient(serverAttackPacket);
+        if (isMultiPlayer) clientThread2.sendPacketToClient(serverAttackPacket);
     }
 
 

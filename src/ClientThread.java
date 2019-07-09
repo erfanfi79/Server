@@ -19,7 +19,7 @@ public class ClientThread extends Thread {
     private InputStreamReader inputStreamReader;
     private OutputStreamWriter outputStreamWriter;
     private Socket socket;
-    private MatchManager matchManager;      //todo see that is this necessary?
+    private MatchManager matchManager;
 
     public ClientThread(Socket socket) {
 
@@ -59,9 +59,6 @@ public class ClientThread extends Thread {
 
             else if (packet instanceof ClientLoginPacket)
                 accountMenu((ClientLoginPacket) packet);
-
-            else if (packet instanceof ClientStartMatchPacket)
-                startMatchPacketHandler((ClientStartMatchPacket) packet);
 
             else if (packet instanceof ClientBuyAndSellPacket)
                 buyAndSell((ClientBuyAndSellPacket) packet);
@@ -114,6 +111,10 @@ public class ClientThread extends Thread {
                 enterCollection();
                 break;
 
+            case MULTI_PLAYER:
+
+            case SINGLE_PLAYER:
+
         }
     }
 
@@ -146,9 +147,9 @@ public class ClientThread extends Thread {
         sendPacketToClient(packet);
     }
 
-    private void startMatchPacketHandler(ClientStartMatchPacket packet) {
+    private void createMatch(boolean isMultiPlayer) {
 
-        if (packet.isMultiPlayerGame()) {
+        if (isMultiPlayer) {
 
             if (Server.getWaitersForMultiPlayerGame().size() == 0)
                 Server.getWaitersForMultiPlayerGame().add(this);
@@ -163,6 +164,18 @@ public class ClientThread extends Thread {
 
                 matchInputHandler();
             }
+        } else {
+
+            matchManager = new MatchManager(this);
+
+        }
+    }
+
+    private void startMatchPacketHandler(ClientStartMatchPacket packet) {
+
+        if (packet.isMultiPlayerGame()) {
+
+
         } else {
 
             //todo Single player game
