@@ -116,11 +116,12 @@ public class ClientThread extends Thread {
                 break;
 
             case MULTI_PLAYER:
+                createMatch(true);
                 break;
 
             case SINGLE_PLAYER:
+                createMatch(false);
                 break;
-
         }
     }
 
@@ -179,18 +180,22 @@ public class ClientThread extends Thread {
 
             else {
                 matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
-                matchManager.sendStartMatchPacketToClients();
+                matchManager.sendStartMultiPlayerMatchPacketToClients();
                 matchManager.sendPlayersNameToClients();
                 matchManager.sendMatchInfoToClients();
+                matchManager.sendStartYourTurnToClient(Server.getWaitersForMultiPlayerGame().get(0));
 
                 Server.getWaitersForMultiPlayerGame().remove(0);
 
                 matchInputHandler();
             }
         } else {
-
             matchManager = new MatchManager(this);
+            matchManager.sendPlayersNameToClients();
+            matchManager.sendMatchInfoToClients();
+            matchManager.sendStartYourTurnToClient(this);
 
+            matchInputHandler();
         }
     }
 
@@ -228,7 +233,7 @@ public class ClientThread extends Thread {
         switch (packet.getPacket()) {
 
             case END_TURN:
-                matchManager.endTurn();
+                matchManager.endTurn(this);
                 break;
 
             case END_GAME:

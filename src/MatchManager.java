@@ -37,7 +37,7 @@ public class MatchManager {
         gameLogic = match.getGameLogic();
     }
 
-    public void sendStartMatchPacketToClients() {
+    public void sendStartMultiPlayerMatchPacketToClients() {
 
         clientThread1.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
         if (isMultiPlayer) clientThread2.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
@@ -64,7 +64,7 @@ public class MatchManager {
         VirtualCard[][] table = new VirtualCard[5][9];
 
         for (int row = 0; row < 5; row++)
-            for (int column  = 0; column < 9; column++)
+            for (int column = 0; column < 9; column++)
                 if (cells[row][column] != null)
                     table[row][column] = getVirtualCard((Unit) cells[row][column].getCard());
 
@@ -185,7 +185,7 @@ public class MatchManager {
 
         } else {
 
-            for (Spell spell: card.getSpells()) {
+            for (Spell spell : card.getSpells()) {
 
                 if (!spell.getTarget().isAffectCells()) {   //for minions and hero
 
@@ -215,13 +215,17 @@ public class MatchManager {
     }
 
 
-    public void endTurn() {
-        //todo send start your turn enum
+    public void endTurn(ClientThread clientThread) {
+
         gameLogic.switchTurn();
+
+        if (clientThread == clientThread2) sendStartYourTurnToClient(clientThread1);
+        else if (isMultiPlayer) sendStartYourTurnToClient(clientThread2);
 
         if (!isMultiPlayer) {
             playAI();
             gameLogic.switchTurn();
+            sendStartYourTurnToClient(clientThread1);
             sendMatchInfoToClients();
         }
     }
@@ -255,36 +259,44 @@ public class MatchManager {
 
             case DRAW:
                 historyForPlayer1.setYourStatus(GameStatus.DRAW);
-                if (isMultiPlayer) historyForPlayer2.setYourStatus(GameStatus.DRAW);
+                if (isMultiPlayer) {
+                    historyForPlayer2.setYourStatus(GameStatus.DRAW);
+                    sendServerLogToClient(clientThread2, "GAME DRAW");
+                }
                 sendServerLogToClient(clientThread1, "GAME DRAW");
-                if (isMultiPlayer) sendServerLogToClient(clientThread2, "GAME DRAW");
                 break;
 
             case PLAYER1:
                 clientThread1.getAccount().incrementWinsNumber();
                 clientThread1.getAccount().incrementMoney(1000 /*awardOfGame*/);
                 historyForPlayer1.setYourStatus(GameStatus.WIN);
-                if (isMultiPlayer) historyForPlayer2.setYourStatus(GameStatus.LOST);
+                if (isMultiPlayer) {
+                    historyForPlayer2.setYourStatus(GameStatus.LOST);
+                    sendServerLogToClient(clientThread2, "YOU LOST");
+                }
                 sendServerLogToClient(clientThread1, "YOU WIN");
-                if (isMultiPlayer) sendServerLogToClient(clientThread2, "YOU LOST");
                 break;
 
             case PLAYER2:
-                if (isMultiPlayer) clientThread2.getAccount().incrementWinsNumber();
-                if (isMultiPlayer) clientThread2.getAccount().incrementMoney(1000 /*awardOfGame*/);
+                if (isMultiPlayer) {
+                    clientThread2.getAccount().incrementWinsNumber();
+                    clientThread2.getAccount().incrementMoney(1000 /*awardOfGame*/);
+                    historyForPlayer2.setYourStatus(GameStatus.WIN);
+                    sendServerLogToClient(clientThread2, "YOU WIN");
+                }
                 historyForPlayer1.setYourStatus(GameStatus.LOST);
-                if (isMultiPlayer) historyForPlayer2.setYourStatus(GameStatus.WIN);
                 sendServerLogToClient(clientThread1, "YOU LOST");
-                if (isMultiPlayer) sendServerLogToClient(clientThread2, "YOU WIN");
                 break;
 
         }
 
         clientThread1.getAccount().getMatchHistories().add(historyForPlayer1);
-        if (isMultiPlayer) clientThread2.getAccount().getMatchHistories().add(historyForPlayer2);
-
         clientThread1.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
-        if (isMultiPlayer) clientThread2.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
+
+        if (isMultiPlayer) {
+            clientThread2.getAccount().getMatchHistories().add(historyForPlayer2);
+            clientThread2.sendPacketToClient(new ServerEnumPacket(MATCH_ENDED));
+        }
         return true;
     }
 
@@ -308,6 +320,10 @@ public class MatchManager {
         ServerAttackPacket serverAttackPacket = new ServerAttackPacket(getVirtualCard(card), coordination);
         clientThread1.sendPacketToClient(serverAttackPacket);
         if (isMultiPlayer) clientThread2.sendPacketToClient(serverAttackPacket);
+    }
+
+    public void sendStartYourTurnToClient(ClientThread clientThread) {
+        clientThread.sendPacketToClient(new ServerMatchEnumPacket(ServerMatchEnum.START_YOUR_TURN));
     }
 
 

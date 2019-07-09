@@ -1,6 +1,8 @@
 package packet.serverPacket.serverMatchPacket;
 
-public class ServerMatchEnumPacket {
+import packet.serverPacket.ServerPacket;
+
+public class ServerMatchEnumPacket extends ServerPacket {
 
     private ServerMatchEnum packet;
 
