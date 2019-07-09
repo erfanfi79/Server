@@ -137,7 +137,7 @@ public class ClientThread extends Thread {
             return;
         }
         packet.setSuccessful(true);
-        saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
+        //saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
         sendPacketToClient(packet);
     }
 
@@ -344,8 +344,7 @@ public class ClientThread extends Thread {
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             // write object to file
             oos.writeObject(deck);
-            System.out.println("saved"
-            );
+            System.out.println("saved");
             // closing resources
             oos.close();
             fos.close();
