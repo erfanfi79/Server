@@ -171,18 +171,6 @@ public class ClientThread extends Thread {
         }
     }
 
-    private void startMatchPacketHandler(ClientStartMatchPacket packet) {
-
-        if (packet.isMultiPlayerGame()) {
-
-
-        } else {
-
-            //todo Single player game
-            matchInputHandler();
-        }
-    }
-
 
     private void matchInputHandler() {
 
