@@ -3,22 +3,16 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="651.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controller.LeaderBoardController">
+<?import java.net.URL?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="651.0" prefWidth="856.0"
+            style="-fx-background-color: #8080ff;" xmlns="http://javafx.com/javafx/8"
+            fx:controller="ServerUsersViewController">
     <children>
-        <ImageView fitHeight="745.0" fitWidth="1447.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@../resources/scenes/backgrounds/chapter11_background@2x.jpg"/>
-            </image>
-        </ImageView>
-        <ScrollPane layoutX="480.0" layoutY="205.0" prefHeight="417.0" prefWidth="756.0"
-                    stylesheets="@../resources/ui/style.css">
+        <ScrollPane layoutX="49.0" layoutY="199.0" prefHeight="417.0" prefWidth="756.0">
             <content>
                 <VBox fx:id="vBoxLeaderBoard" prefHeight="428.0" prefWidth="756.0" spacing="5.0"
                       style="-fx-background-color: #4D5A68;">
@@ -27,8 +21,12 @@
                     </padding>
                 </VBox>
             </content>
+            <stylesheets>
+                <URL value="@style.css"/>
+                <URL value="@style.css"/>
+            </stylesheets>
         </ScrollPane>
-        <HBox fx:id="item" alignment="CENTER_LEFT" layoutX="480.0" layoutY="131.0" maxHeight="-Infinity"
+        <HBox fx:id="item" alignment="CENTER_LEFT" layoutX="49.0" layoutY="125.0" maxHeight="-Infinity"
               maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="756.0"
               spacing="140.0"
               style="-fx-background-color: #02030A; -fx-background-radius: 5; -fx-background-insets: 0;">
@@ -62,16 +60,16 @@
                 <Insets left="60.0"/>
             </padding>
         </HBox>
-        <Label layoutX="480.0" layoutY="42.0" prefHeight="89.0" prefWidth="300.0" text="Leader Board">
+        <Label layoutX="49.0" layoutY="36.0" prefHeight="89.0" prefWidth="300.0" text="Users">
             <font>
                 <Font size="36.0"/>
             </font>
         </Label>
-        <Button fx:id="btnBack" cancelButton="true" mnemonicParsing="false" onAction="#gotoStartMenu" prefHeight="653.0"
-                prefWidth="230.0" style="-fx-background-color: #02030A;" text="BACK" textFill="WHITE">
+        <CheckBox fx:id="checkBox" layoutX="650.0" layoutY="59.0" mnemonicParsing="false" onAction="#onlineCheckBox"
+                  prefHeight="43.0" prefWidth="155.0" text="Online Users">
             <font>
-                <Font size="30.0"/>
+                <Font size="18.0"/>
             </font>
-        </Button>
+        </CheckBox>
     </children>
 </AnchorPane>
