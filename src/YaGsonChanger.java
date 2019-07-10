@@ -4,24 +4,18 @@ import packet.serverPacket.ServerPacket;
 
 public class YaGsonChanger {
 
-    public static ClientPacket readClientPacket(String object) {
+    private static YaGsonBuilder yaGsonBuilder = new YaGsonBuilder();
+    private static com.gilecode.yagson.YaGson yaGson = yaGsonBuilder.create();
 
-        YaGsonBuilder yaGsonBuilder = new YaGsonBuilder();
-        com.gilecode.yagson.YaGson yaGson = yaGsonBuilder.create();
+    public static ClientPacket readClientPacket(String object) {
         return yaGson.fromJson(object, ClientPacket.class);
     }
 
     public static ServerPacket readServerPocket(String object) {
-
-        YaGsonBuilder yaGsonBuilder = new YaGsonBuilder();
-        com.gilecode.yagson.YaGson yaGson = yaGsonBuilder.create();
         return yaGson.fromJson(object, ServerPacket.class);
     }
 
     public static String write(Object packet) {
-
-        YaGsonBuilder yaGsonBuilder = new YaGsonBuilder();
-        com.gilecode.yagson.YaGson yaGson = yaGsonBuilder.create();
         return yaGson.toJson(packet);
     }
 }

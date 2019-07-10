@@ -1,3 +1,4 @@
+import jdk.internal.util.xml.impl.Input;
 import models.*;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
@@ -16,15 +17,16 @@ import java.util.Comparator;
 public class ClientThread extends Thread {
 
     private Account account;
-    private InputStreamReader inputStreamReader;
-    private OutputStreamWriter outputStreamWriter;
     private MatchManager matchManager;
+    private BufferedWriter bufferedWriter;
+    private BufferedReader bufferedReader;
+
 
     public ClientThread(Socket socket) {
 
             try {
-            inputStreamReader = new InputStreamReader(socket.getInputStream());
-            outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
+            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -188,9 +190,9 @@ public class ClientThread extends Thread {
             }
         } else {
             matchManager = new MatchManager(this);
+            matchManager.sendStartYourTurnToClient(this);
             matchManager.sendPlayersNameToClients();
             matchManager.sendMatchInfoToClients();
-            matchManager.sendStartYourTurnToClient(this);
 
             matchInputHandler();
         }
@@ -198,8 +200,6 @@ public class ClientThread extends Thread {
 
 
     private void matchInputHandler() {
-
-        //todo pay attention to turn for who
 
         while (true) {
             ClientPacket packet = getPacketFromClient();
@@ -259,7 +259,6 @@ public class ClientThread extends Thread {
     public ClientPacket getPacketFromClient() {
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             return YaGsonChanger.readClientPacket(bufferedReader.readLine());
 
         } catch (IOException e) {
@@ -271,7 +270,6 @@ public class ClientThread extends Thread {
     public void sendPacketToClient(ServerPacket serverPacket) {
 
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
             bufferedWriter.write(YaGsonChanger.write(serverPacket));
             bufferedWriter.newLine();
             bufferedWriter.flush();
