@@ -36,8 +36,8 @@ public class ClientThread extends Thread {
         try {
             start();
         } catch (Exception e) {
-
-            Server.getOnlineUsers().remove(this);
+            if (account != null)
+                LoginMenu.getOnlineUsers().remove(account);
             e.printStackTrace();
         }
     }
@@ -195,9 +195,7 @@ public class ClientThread extends Thread {
                     System.err.println("khalie khalie");
                     Server.getWaitersForMultiPlayerGame().add(this);
                     matchInputHandler();
-                }
-
-                else {
+                } else {
                     System.err.println("pore");
                     matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
                     matchManager.sendStartMultiPlayerMatchPacketToClients();
@@ -208,6 +206,7 @@ public class ClientThread extends Thread {
                     Server.getWaitersForMultiPlayerGame().remove(0);
 
                     matchInputHandler();
+
                 }
             } else {
                 matchManager = new MatchManager(this);
@@ -280,8 +279,10 @@ public class ClientThread extends Thread {
         LoginHandler loginHandler = new LoginHandler(clientLoginPacket);
         ServerLogPacket serverLogPacket = loginHandler.handleLogin();
 
-        if (serverLogPacket.isSuccessful())
-            this.account = loginHandler.getAccount();
+        if (serverLogPacket.isSuccessful()) {
+            account = loginHandler.getAccount();
+            LoginMenu.getOnlineUsers().add(account);
+        }
         sendPacketToClient(serverLogPacket);
     }
 
@@ -304,7 +305,7 @@ public class ClientThread extends Thread {
             bufferedWriter.flush();
 
         } catch (IOException e) {
-//            close();
+            //close();
             e.printStackTrace();
         }
     }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class LoginMenu {
     private static ArrayList<Account> users = new ArrayList<Account>();
+    private static ArrayList<Account> onlineUsers = new ArrayList<Account>();
     private static LoginMenu loginMenu;
 
     static {
@@ -81,6 +82,10 @@ public class LoginMenu {
                     e.printStackTrace();
                 }
             }
+    }
+
+    public static ArrayList<Account> getOnlineUsers() {
+        return onlineUsers;
     }
 
     public static ArrayList<Account> getUsers() {

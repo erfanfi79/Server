@@ -1,25 +1,25 @@
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import models.Account;
 import models.LoginMenu;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class ServerUsersViewController extends Application implements Runnable {
+public class ServerUsersViewController implements Runnable {
     private static ServerUsersViewController serverUsersViewController;
     private double x, y;
+
+    public static void setServerUsersViewController(ServerUsersViewController serverUsersViewController) {
+        ServerUsersViewController.serverUsersViewController = serverUsersViewController;
+    }
+
     @FXML
     private HBox item;
 
@@ -38,40 +38,11 @@ public class ServerUsersViewController extends Application implements Runnable {
     @FXML
     private CheckBox checkBox;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     @FXML
     void onlineCheckBox() {
         if (checkBox.isSelected())
             showOnlineUsers();
         else showAllUsers();
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("view/Users.fxml"));
-        Parent root = fxmlLoader.load();
-        serverUsersViewController = fxmlLoader.getController();
-        serverUsersViewController.onlineCheckBox();
-        new Thread(this).start();
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        root.setOnMousePressed(event -> {
-            x = event.getSceneX();
-            y = event.getSceneY();
-        });
-
-        root.setOnMouseDragged(event -> {
-
-            primaryStage.setX(event.getScreenX() - x);
-            primaryStage.setY(event.getScreenY() - y);
-
-        });
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
     }
 
     public void initializeLeaderboard(ArrayList<String> usernames, ArrayList<Integer> winsNum) {
@@ -120,9 +91,9 @@ public class ServerUsersViewController extends Application implements Runnable {
     public void showOnlineUsers() {
         ArrayList<String> usernames = new ArrayList<>();
         ArrayList<Integer> winsNum = new ArrayList<>();
-        for (ClientThread clientThread : Server.getOnlineUsers()) {
-            usernames.add(clientThread.getAccount().getUserName());
-            winsNum.add(clientThread.getAccount().getWinsNumber());
+        for (Account account : LoginMenu.getOnlineUsers()) {
+            usernames.add(account.getUserName());
+            winsNum.add(account.getWinsNumber());
         }
         initializeLeaderboard(usernames, winsNum);
     }
