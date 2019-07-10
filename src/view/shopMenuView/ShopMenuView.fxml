@@ -6,7 +6,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="720.0" prefWidth="1043.0"
-            style="-fx-background-color: #8080ff;" xmlns="http://javafx.com/javafx/8" fx:controller="ServerShopView">
+            style="-fx-background-color: #8080ff;" xmlns="http://javafx.com/javafx/8"
+            fx:controller="controller.ShopController">
     <children>
         <ScrollPane layoutX="50.0" layoutY="30.0" prefHeight="644.0" prefWidth="943.0"
                     style="-fx-background-color: #215272;" stylesheets="@../style.css">

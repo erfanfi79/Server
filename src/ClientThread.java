@@ -183,30 +183,36 @@ public class ClientThread extends Thread {
     }
 
     private void createMatch(boolean isMultiPlayer) {
+        try {
+            if (isMultiPlayer) {
 
-        if (isMultiPlayer) {
+                if (Server.getWaitersForMultiPlayerGame().size() == 0)
+                    Server.getWaitersForMultiPlayerGame().add(this);
 
-            if (Server.getWaitersForMultiPlayerGame().size() == 0)
-                Server.getWaitersForMultiPlayerGame().add(this);
+                else {
+                    matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
+                    matchManager.sendStartMultiPlayerMatchPacketToClients();
+                    matchManager.sendPlayersNameToClients();
+                    matchManager.sendMatchInfoToClients();
+                    matchManager.sendStartYourTurnToClient(Server.getWaitersForMultiPlayerGame().get(0));
 
-            else {
-                matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
-                matchManager.sendStartMultiPlayerMatchPacketToClients();
+                    Server.getWaitersForMultiPlayerGame().remove(0);
+
+                    matchInputHandler();
+
+                }
+            } else {
+                matchManager = new MatchManager(this);
                 matchManager.sendPlayersNameToClients();
+                Thread.sleep(100);
                 matchManager.sendMatchInfoToClients();
-                matchManager.sendStartYourTurnToClient(Server.getWaitersForMultiPlayerGame().get(0));
-
-                Server.getWaitersForMultiPlayerGame().remove(0);
+                Thread.sleep(100);
+                matchManager.sendStartYourTurnToClient(this);
 
                 matchInputHandler();
             }
-        } else {
-            matchManager = new MatchManager(this);
-            matchManager.sendPlayersNameToClients();
-            matchManager.sendMatchInfoToClients();
-            matchManager.sendStartYourTurnToClient(this);
-
-            matchInputHandler();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -291,6 +297,7 @@ public class ClientThread extends Thread {
             bufferedWriter.flush();
 
         } catch (IOException e) {
+            close();
             e.printStackTrace();
         }
     }
