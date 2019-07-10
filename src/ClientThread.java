@@ -19,10 +19,11 @@ public class ClientThread extends Thread {
     private InputStreamReader inputStreamReader;
     private OutputStreamWriter outputStreamWriter;
     private MatchManager matchManager;
+    private Socket socket;
 
     public ClientThread(Socket socket) {
-
-            try {
+        this.socket = socket;
+        try {
             inputStreamReader = new InputStreamReader(socket.getInputStream());
             outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
         } catch (IOException e) {
@@ -44,26 +45,39 @@ public class ClientThread extends Thread {
 
     @Override
     public void run() {
+        try {
+            while (true) {
+                ClientPacket packet = getPacketFromClient();
 
-        while (true) {
-            ClientPacket packet = getPacketFromClient();
+                if (packet instanceof ClientEnumPacket)
+                    enumPacketHandler((ClientEnumPacket) packet);
 
-            if (packet instanceof ClientEnumPacket)
-                enumPacketHandler((ClientEnumPacket) packet);
+                else if (packet instanceof ClientChatRoomPacket)
+                    ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
 
-            else if (packet instanceof ClientChatRoomPacket)
-                ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
+                else if (packet instanceof ClientLoginPacket)
+                    accountMenu((ClientLoginPacket) packet);
 
-            else if (packet instanceof ClientLoginPacket)
-                accountMenu((ClientLoginPacket) packet);
+                else if (packet instanceof ClientBuyAndSellPacket)
+                    buyAndSell((ClientBuyAndSellPacket) packet);
 
-            else if (packet instanceof ClientBuyAndSellPacket)
-                buyAndSell((ClientBuyAndSellPacket) packet);
-
-            else if (packet instanceof ClientCollectionPacket) {
-                account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
-                Account.save(account);
+                else if (packet instanceof ClientCollectionPacket) {
+                    account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
+                    Account.save(account);
+                }
             }
+        } catch (Exception e) {
+            Server.getOnlineUsers().remove(this);
+            close();
+        }
+    }
+
+    public void close() {
+        try {
+            if (socket != null) socket.close();
+            if (inputStreamReader != null) inputStreamReader.close();
+            if (outputStreamWriter != null) outputStreamWriter.close();
+        } catch (Exception e) {
         }
     }
 
