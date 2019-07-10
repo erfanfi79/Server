@@ -21,6 +21,8 @@ public class ClientThread extends Thread {
     private BufferedReader bufferedReader;
     private Socket socket;
 
+    private boolean isPlaying = false;
+
     public ClientThread(Socket socket) {
 
         this.socket = socket;
@@ -68,17 +70,18 @@ public class ClientThread extends Thread {
                 }
             }
         } catch (Exception e) {
-            Server.getOnlineUsers().remove(this);
-            close();
+            e.printStackTrace();
+//            Server.getOnlineUsers().remove(this);
+//            close();
         }
     }
 
     public void close() {
         try {
             if (socket != null) socket.close();
-//            if (inputStreamReader != null) inputStreamReader.close();
-//            if (outputStreamWriter != null) outputStreamWriter.close();
-        } catch (Exception e) {
+            if (bufferedWriter != null) bufferedWriter.close();
+            if (bufferedReader != null) bufferedReader.close();
+        } catch (Exception ignored) {
         }
     }
 
@@ -108,6 +111,7 @@ public class ClientThread extends Thread {
                 break;
 
             case CANCEL_WAITING_FOR_MULTI_PLAYER_GAME:
+                isPlaying = false;
                 Server.getWaitersForMultiPlayerGame().remove(this);
                 break;
 
@@ -187,10 +191,14 @@ public class ClientThread extends Thread {
         try {
             if (isMultiPlayer) {
 
-                if (Server.getWaitersForMultiPlayerGame().size() == 0)
+                if (Server.getWaitersForMultiPlayerGame().size() == 0) {
+                    System.err.println("khalie khalie");
                     Server.getWaitersForMultiPlayerGame().add(this);
+                    matchInputHandler();
+                }
 
                 else {
+                    System.err.println("pore");
                     matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
                     matchManager.sendStartMultiPlayerMatchPacketToClients();
                     matchManager.sendPlayersNameToClients();
@@ -200,7 +208,6 @@ public class ClientThread extends Thread {
                     Server.getWaitersForMultiPlayerGame().remove(0);
 
                     matchInputHandler();
-
                 }
             } else {
                 matchManager = new MatchManager(this);
@@ -218,7 +225,9 @@ public class ClientThread extends Thread {
 
     private void matchInputHandler() {
 
-        while (true) {
+        isPlaying = true;
+
+        while (isPlaying) {
             ClientPacket packet = getPacketFromClient();
 
             if (packet instanceof ClientMovePacket)
@@ -236,9 +245,12 @@ public class ClientThread extends Thread {
             else if (packet instanceof ClientMatchEnumPacket)
                 matchEnumInputHandler((ClientMatchEnumPacket) packet);
 
+            else if (packet instanceof ClientEnumPacket)
+                enumPacketHandler((ClientEnumPacket) packet);
+
             matchManager.sendMatchInfoToClients();
 
-            if (matchManager.isMatchFinished()) break;
+            if (matchManager.isMatchFinished()) isPlaying = false;
         }
     }
 
@@ -292,7 +304,7 @@ public class ClientThread extends Thread {
             bufferedWriter.flush();
 
         } catch (IOException e) {
-            close();
+//            close();
             e.printStackTrace();
         }
     }

@@ -39,8 +39,9 @@ public class MatchManager {
 
     public void sendStartMultiPlayerMatchPacketToClients() {
 
-        clientThread1.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
-        if (isMultiPlayer) clientThread2.sendPacketToClient(new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY));
+        ServerEnumPacket serverEnumPacket = new ServerEnumPacket(MULTI_PLAYER_GAME_IS_READY);
+        clientThread1.sendPacketToClient(serverEnumPacket);
+        clientThread2.sendPacketToClient(serverEnumPacket);
     }
 
     public void sendPlayersNameToClients() {
