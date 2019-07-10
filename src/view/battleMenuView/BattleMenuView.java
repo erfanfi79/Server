@@ -1,11 +1,10 @@
 package view.battleMenuView;
 
-import view.View;
 import view.battleMenuView.battleMenuViewChilds.BattleMenuError;
 
 import java.util.ArrayList;
 
-public class BattleMenuView extends View {
+public class BattleMenuView {
     private static BattleMenuView battleMenuView;
 
     public static BattleMenuView getInstance() {
