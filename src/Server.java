@@ -95,7 +95,7 @@ public class Server extends Application implements Runnable {
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
         new Thread(this).start();
-        gotoServerShop();
-        gotoServerUsers();
+        //gotoServerShop();
+        // gotoServerUsers();
     }
 }

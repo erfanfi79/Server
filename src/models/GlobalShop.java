@@ -70,4 +70,12 @@ public class GlobalShop {
 
         return numOfItemInCollection >= 3;
     }
+
+    public int getCardCost(String name) {
+        for (Card card : shopCollection.getCards())
+            if (card.getCardName().equals(name))
+                return card.getPrice();
+
+        return 0;
+    }
 }
