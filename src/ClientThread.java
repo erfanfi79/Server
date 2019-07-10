@@ -1,4 +1,3 @@
-import jdk.internal.util.xml.impl.Input;
 import models.*;
 import packet.clientPacket.*;
 import packet.clientPacket.clientMatchPacket.ClientAttackPacket;
@@ -20,11 +19,12 @@ public class ClientThread extends Thread {
     private MatchManager matchManager;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
-
+    private Socket socket;
 
     public ClientThread(Socket socket) {
 
-            try {
+        this.socket = socket;
+        try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
@@ -46,26 +46,39 @@ public class ClientThread extends Thread {
 
     @Override
     public void run() {
+        try {
+            while (true) {
+                ClientPacket packet = getPacketFromClient();
 
-        while (true) {
-            ClientPacket packet = getPacketFromClient();
+                if (packet instanceof ClientEnumPacket)
+                    enumPacketHandler((ClientEnumPacket) packet);
 
-            if (packet instanceof ClientEnumPacket)
-                enumPacketHandler((ClientEnumPacket) packet);
+                else if (packet instanceof ClientChatRoomPacket)
+                    ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
 
-            else if (packet instanceof ClientChatRoomPacket)
-                ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
+                else if (packet instanceof ClientLoginPacket)
+                    accountMenu((ClientLoginPacket) packet);
 
-            else if (packet instanceof ClientLoginPacket)
-                accountMenu((ClientLoginPacket) packet);
+                else if (packet instanceof ClientBuyAndSellPacket)
+                    buyAndSell((ClientBuyAndSellPacket) packet);
 
-            else if (packet instanceof ClientBuyAndSellPacket)
-                buyAndSell((ClientBuyAndSellPacket) packet);
-
-            else if (packet instanceof ClientCollectionPacket) {
-                account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
-                Account.save(account);
+                else if (packet instanceof ClientCollectionPacket) {
+                    account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
+                    Account.save(account);
+                }
             }
+        } catch (Exception e) {
+            Server.getOnlineUsers().remove(this);
+            close();
+        }
+    }
+
+    public void close() {
+        try {
+            if (socket != null) socket.close();
+//            if (inputStreamReader != null) inputStreamReader.close();
+//            if (outputStreamWriter != null) outputStreamWriter.close();
+        } catch (Exception e) {
         }
     }
 
@@ -171,30 +184,34 @@ public class ClientThread extends Thread {
     }
 
     private void createMatch(boolean isMultiPlayer) {
+        try {
+            if (isMultiPlayer) {
 
-        if (isMultiPlayer) {
+                if (Server.getWaitersForMultiPlayerGame().size() == 0)
+                    Server.getWaitersForMultiPlayerGame().add(this);
 
-            if (Server.getWaitersForMultiPlayerGame().size() == 0)
-                Server.getWaitersForMultiPlayerGame().add(this);
+                else {
+                    matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
+                    matchManager.sendStartMultiPlayerMatchPacketToClients();
+                    matchManager.sendPlayersNameToClients();
+                    matchManager.sendMatchInfoToClients();
+                    matchManager.sendStartYourTurnToClient(Server.getWaitersForMultiPlayerGame().get(0));
 
-            else {
-                matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
-                matchManager.sendStartMultiPlayerMatchPacketToClients();
+                    Server.getWaitersForMultiPlayerGame().remove(0);
+
+                    matchInputHandler();
+
+                }
+            } else {
+                matchManager = new MatchManager(this);
                 matchManager.sendPlayersNameToClients();
                 matchManager.sendMatchInfoToClients();
-                matchManager.sendStartYourTurnToClient(Server.getWaitersForMultiPlayerGame().get(0));
-
-                Server.getWaitersForMultiPlayerGame().remove(0);
+                matchManager.sendStartYourTurnToClient(this);
 
                 matchInputHandler();
             }
-        } else {
-            matchManager = new MatchManager(this);
-            matchManager.sendStartYourTurnToClient(this);
-            matchManager.sendPlayersNameToClients();
-            matchManager.sendMatchInfoToClients();
-
-            matchInputHandler();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -275,6 +292,7 @@ public class ClientThread extends Thread {
             bufferedWriter.flush();
 
         } catch (IOException e) {
+            close();
             e.printStackTrace();
         }
     }

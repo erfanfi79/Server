@@ -25,11 +25,8 @@ public class Server {
             System.err.println("Waiting for connect a client ...");
 
             onlineUsers.add(new ClientThread(serverSocket.accept()));
-            //todo delete from online users if exception
 
             System.err.println("Client connected");
         }
     }
 }
-
-//todo show online user in server

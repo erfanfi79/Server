@@ -1,8 +1,7 @@
 package packet.serverPacket.serverMatchPacket;
 
-import packet.serverPacket.ServerPacket;
 
-public class ServerMatchInfoPacket extends ServerPacket {
+public class ServerMatchInfoPacket extends ServerMatchPacket {
 
     private VirtualCard[][] table;  //Virtual[5][9]
     private int player1Mana, player2Mana;

@@ -2,7 +2,7 @@ package packet.serverPacket.serverMatchPacket;
 
 import packet.serverPacket.ServerPacket;
 
-public class ServerPlayersUserNamePacket extends ServerPacket {
+public class ServerPlayersUserNamePacket extends ServerMatchPacket {
 
     private String player1UserName, player2UserName;
 

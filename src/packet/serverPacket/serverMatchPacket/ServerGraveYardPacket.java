@@ -1,11 +1,10 @@
 package packet.serverPacket.serverMatchPacket;
 
 import models.Card;
-import packet.serverPacket.ServerPacket;
 
 import java.util.ArrayList;
 
-public class ServerGraveYardPacket extends ServerPacket {
+public class ServerGraveYardPacket extends ServerMatchPacket {
 
     private ArrayList<Card> deadCards;
 

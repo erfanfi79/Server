@@ -3,7 +3,7 @@ package packet.serverPacket.serverMatchPacket;
 import models.Coordination;
 import packet.serverPacket.ServerPacket;
 
-public class ServerMovePacket extends ServerPacket {
+public class ServerMovePacket extends ServerMatchPacket {
 
     private VirtualCard card;
     private Coordination start, destination;

@@ -2,7 +2,7 @@ package packet.serverPacket.serverMatchPacket;
 
 import packet.serverPacket.ServerPacket;
 
-public class ServerMatchEnumPacket extends ServerPacket {
+public class ServerMatchEnumPacket extends ServerMatchPacket {
 
     private ServerMatchEnum packet;
 
