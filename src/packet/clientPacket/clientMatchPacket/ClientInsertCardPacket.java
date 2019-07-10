@@ -18,4 +18,11 @@ public class ClientInsertCardPacket extends ClientPacket {
         coordination.setColumn(column);
         return coordination;
     }
+
+    public ClientInsertCardPacket(int row, int column, int whichHandCard) {
+
+        this.row = row;
+        this.column = column;
+        this.whichHandCard = whichHandCard;
+    }
 }

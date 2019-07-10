@@ -65,7 +65,7 @@ public class MatchManager {
 
         for (int row = 0; row < 5; row++)
             for (int column = 0; column < 9; column++)
-                if (cells[row][column] != null)
+                if (cells[row][column].getCard() != null)
                     table[row][column] = getVirtualCard((Unit) cells[row][column].getCard());
 
         packet.setTable(table, match.getPlayer1Mana(), match.getPlayer2Mana());

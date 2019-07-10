@@ -18,14 +18,11 @@ public class ClientThread extends Thread {
     private Account account;
     private InputStreamReader inputStreamReader;
     private OutputStreamWriter outputStreamWriter;
-    private Socket socket;
     private MatchManager matchManager;
 
     public ClientThread(Socket socket) {
 
-        this.socket = socket;
-
-        try {
+            try {
             inputStreamReader = new InputStreamReader(socket.getInputStream());
             outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
         } catch (IOException e) {
@@ -208,12 +205,12 @@ public class ClientThread extends Thread {
             ClientPacket packet = getPacketFromClient();
 
             if (packet instanceof ClientMovePacket)
-                matchManager.move(this, ((ClientMovePacket) packet).getStartCoordination(),
-                        ((ClientMovePacket) packet).getDestinationCoordination());
+                matchManager.move(this, ((ClientMovePacket) packet).getStart(),
+                        ((ClientMovePacket) packet).getDestination());
 
             else if (packet instanceof ClientAttackPacket)
-                matchManager.attack(this, ((ClientAttackPacket) packet).getAttackerCoordination(),
-                        ((ClientAttackPacket) packet).getDefenderCoordination());
+                matchManager.attack(this, ((ClientAttackPacket) packet).getAttacker(),
+                        ((ClientAttackPacket) packet).getDefender());
 
             else if (packet instanceof ClientInsertCardPacket)
                 matchManager.insert(this, ((ClientInsertCardPacket) packet).getWhichHandCard(),

@@ -5,37 +5,21 @@ import packet.clientPacket.ClientPacket;
 
 public class ClientMovePacket extends ClientPacket {
 
-    private int startRow, startColumn, destinationRow, destinationColumn;
+    private Coordination start, destination;
 
-    public void setDestinationColumn(int destinationColumn) {
-        this.destinationColumn = destinationColumn;
+    public Coordination getStart() {
+        return start;
     }
 
-    public void setDestinationRow(int destinationRow) {
-        this.destinationRow = destinationRow;
+    public Coordination getDestination() {
+        return destination;
     }
 
-    public void setStartColumn(int startColumn) {
-        this.startColumn = startColumn;
+    public void setDestination(Coordination destination) {
+        this.destination = destination;
     }
 
-    public void setStartRow(int startRow) {
-        this.startRow = startRow;
-    }
-
-    public Coordination getStartCoordination() {
-
-        Coordination coordination = new Coordination();
-        coordination.setRow(startRow);
-        coordination.setColumn(startColumn);
-        return coordination;
-    }
-
-    public Coordination getDestinationCoordination() {
-
-        Coordination coordination = new Coordination();
-        coordination.setRow(destinationRow);
-        coordination.setColumn(destinationColumn);
-        return coordination;
+    public void setStart(Coordination start) {
+        this.start = start;
     }
 }

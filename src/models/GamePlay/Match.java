@@ -85,8 +85,8 @@ public class Match {
         hero1.setCell(cellHero1);
         hero2.setCell(cellHero2);
 
-        gameLogic.cardsInTablePlayer1.add(hero1);
-        gameLogic.cardsInTablePlayer2.add(hero2);
+        gameLogic.getCardsInTablePlayer1().add(hero1);
+        gameLogic.getCardsInTablePlayer2().add(hero2);
     }
 
     private void initializePlayerVariables() {

@@ -5,37 +5,21 @@ import packet.clientPacket.ClientPacket;
 
 public class ClientAttackPacket extends ClientPacket {
 
-    private int attackerRow, attackerColumn, defenderRow, defenderColumn;
+    private Coordination attacker, defender;
 
-    public void setAttackerColumn(int attackerColumn) {
-        this.attackerColumn = attackerColumn;
+    public Coordination getAttacker() {
+        return attacker;
     }
 
-    public void setAttackerRow(int attackerRow) {
-        this.attackerRow = attackerRow;
+    public Coordination getDefender() {
+        return defender;
     }
 
-    public void setDefenderColumn(int defenderColumn) {
-        this.defenderColumn = defenderColumn;
+    public void setAttacker(Coordination attacker) {
+        this.attacker = attacker;
     }
 
-    public void setDefenderRow(int defenderRow) {
-        this.defenderRow = defenderRow;
-    }
-
-    public Coordination getAttackerCoordination() {
-
-        Coordination coordination = new Coordination();
-        coordination.setColumn(attackerColumn);
-        coordination.setRow(attackerRow);
-        return coordination;
-    }
-
-    public Coordination getDefenderCoordination() {
-
-        Coordination coordination = new Coordination();
-        coordination.setColumn(defenderColumn);
-        coordination.setRow(defenderRow);
-        return coordination;
+    public void setDefender(Coordination defender) {
+        this.defender = defender;
     }
 }
