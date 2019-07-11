@@ -17,6 +17,10 @@ public class Server extends Application implements Runnable {
     private static Stage stage;
     private double x, y;
 
+    public static ArrayList<ClientThread> getOnlineUsers() {
+        return onlineUsers;
+    }
+
     public static ArrayList<ClientThread> getWaitersForMultiPlayerGame() {
         return waitersForMultiPlayerGame;
     }

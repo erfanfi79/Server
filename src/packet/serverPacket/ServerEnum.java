@@ -4,5 +4,6 @@ public enum ServerEnum {
 
     MULTI_PLAYER_GAME_IS_READY,
     MATCH_ENDED,
-    UPDATE_LEADER_BOARD
+    UPDATE_LEADER_BOARD,
+    CLOSE
 }
