@@ -80,8 +80,7 @@ public class ClientThread extends Thread {
             }
         } catch (Exception e) {
             System.err.println("client disconnected");
-//            Server.getOnlineUsers().remove(this);
-//            close();
+            close();
         }
     }
 
@@ -109,7 +108,6 @@ public class ClientThread extends Thread {
             if (account != null)
                 LoginMenu.getOnlineUsers().remove(account);
             Server.getOnlineUsers().remove(this);
-            sendPacketToClient(new ServerEnumPacket(ServerEnum.CLOSE));
         } catch (Exception e) {
         }
         try {
