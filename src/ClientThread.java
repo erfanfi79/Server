@@ -59,6 +59,9 @@ public class ClientThread extends Thread {
                 else if (packet instanceof ClientChatRoomPacket)
                     ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
 
+                else if (packet instanceof ClientAuctionPacket)
+                    handleAuction((ClientAuctionPacket) packet);
+
                 else if (packet instanceof ClientLoginPacket)
                     accountMenu((ClientLoginPacket) packet);
 
@@ -75,6 +78,10 @@ public class ClientThread extends Thread {
 //            Server.getOnlineUsers().remove(this);
 //            close();
         }
+    }
+
+    public void handleAuction(ClientAuctionPacket packet) {
+
     }
 
     public void handleCheatCode(ClientCheatPacket packet) {
@@ -156,8 +163,13 @@ public class ClientThread extends Thread {
             case LEADER_BOARD_ONLINE:
                 sendLeaderBoard(true);
                 break;
+
+            case AUCTION:
+
+                break;
         }
     }
+
     private void checkValidateDeck() {
         ServerLogPacket packet = new ServerLogPacket();
         if (account.getCollection().getSelectedDeck() == null) {
