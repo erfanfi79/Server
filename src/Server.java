@@ -4,6 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import packet.serverPacket.ServerEnum;
+import packet.serverPacket.ServerEnumPacket;
 
 import java.net.ServerSocket;
 import java.util.ArrayList;
