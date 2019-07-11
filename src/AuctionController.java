@@ -37,7 +37,8 @@ public class AuctionController implements Runnable {
 
     }
 
-    public ServerPacket getPacket() {
+    public ServerPacket getPacket(ClientThread clientThread) {
+        buyers.add(clientThread);
         ServerAuctionPacket serverAuctionPacket = new ServerAuctionPacket();
         serverAuctionPacket.card = card;
         serverAuctionPacket.startTime = time;
@@ -70,16 +71,32 @@ public class AuctionController implements Runnable {
                     clientThread.enterShop();
             }
         }
+        for (ClientThread clientThread : buyers) {
+            ServerAuctionPacket packet = new ServerAuctionPacket();
+            packet.card = card;
+            packet.highestPrice = 0;
+            packet.startTime = 1;
+            clientThread.sendPacketToClient(packet);
+        }
     }
 
     public void addPrice(int highestPrice, Account account) {
         buyer = account;
         this.highestPrice = highestPrice;
+        for (ClientThread clientThread : buyers) {
+            ServerAuctionPacket packet = new ServerAuctionPacket();
+            packet.card = card;
+            packet.highestPrice = highestPrice;
+            packet.startTime = time;
+            clientThread.sendPacketToClient(packet);
+        }
     }
 
     public void buildAuction(ClientAuctionPacket packet, Account account) {
         seller = account;
         if (isEmpty) {
+            highestPrice = packet.getPrice();
+            buyer = account;
             card = GlobalShop.getGlobalShop().getCardByName(packet.getCardName());
             time = System.currentTimeMillis();
             isEmpty = false;

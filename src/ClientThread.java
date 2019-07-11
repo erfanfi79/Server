@@ -215,7 +215,7 @@ public class ClientThread extends Thread {
             return;
         }
         packet.setSuccessful(true);
-        saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
+        //saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
         sendPacketToClient(packet);
     }
 
