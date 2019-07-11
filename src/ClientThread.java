@@ -197,7 +197,7 @@ public class ClientThread extends Thread {
                 break;
 
             case AUCTION:
-                sendPacketToClient(AuctionController.getInstance().getPacket());
+                sendPacketToClient(AuctionController.getInstance().getPacket(this));
                 break;
         }
     }
@@ -215,7 +215,7 @@ public class ClientThread extends Thread {
             return;
         }
         packet.setSuccessful(true);
-        //saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
+        saveDeckInDefaultMode(account.getCollection().getSelectedDeck());
         sendPacketToClient(packet);
     }
 
