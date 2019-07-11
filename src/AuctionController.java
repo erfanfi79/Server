@@ -1,3 +1,5 @@
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import models.Account;
 import models.Card;
 import models.GlobalShop;
@@ -9,7 +11,7 @@ import java.util.ArrayList;
 
 public class AuctionController implements Runnable {
     private static AuctionController auctionController;
-    private static ArrayList<ClientThread> buyers = new ArrayList<>();
+    public static ArrayList<ClientThread> buyers = new ArrayList<>();
     private boolean isEmpty = true;
     private Account buyer, seller;
     private long time;
@@ -49,7 +51,29 @@ public class AuctionController implements Runnable {
         return card;
     }
 
-    public void addPrice(int highestPrice) {
+    public void finish() {
+        if (buyer != null) {
+            buyer.setMoney(buyer.getMoney() - highestPrice);
+            seller.setMoney(seller.getMoney() + highestPrice);
+            for (int i = seller.getCollection().getCards().size() - 1; i >= 0; i--)
+                if (seller.getCollection().getCards().get(i).getCardName().equals(card.getCardName())) {
+                    Card soldCard = seller.getCollection().getCards().get(i);
+                    seller.getCollection().getCards().remove(soldCard);
+                    break;
+                }
+            buyer.setID(card);
+            buyer.getCollection().getCards().add(card);
+            for (ClientThread clientThread : buyers) {
+                if (clientThread.getAccount().equals(buyer))
+                    clientThread.enterShop();
+                if (clientThread.getAccount().equals(seller))
+                    clientThread.enterShop();
+            }
+        }
+    }
+
+    public void addPrice(int highestPrice, Account account) {
+        buyer = account;
         this.highestPrice = highestPrice;
     }
 
@@ -59,6 +83,15 @@ public class AuctionController implements Runnable {
             card = GlobalShop.getGlobalShop().getCardByName(packet.getCardName());
             time = System.currentTimeMillis();
             isEmpty = false;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    PauseTransition delay = new PauseTransition(Duration.seconds(180));
+                    delay.setOnFinished(event -> finish());
+                    delay.play();
+                }
+            });
+
         }
     }
 }
