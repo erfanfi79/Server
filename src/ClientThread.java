@@ -194,7 +194,7 @@ public class ClientThread extends Thread {
         sendPacketToClient(historyPacket);
     }
 
-    private void sendLeaderBoard(boolean isOnline) {
+    public void sendLeaderBoard(boolean isOnline) {
         ArrayList<Account> users = new ArrayList<>();
         if (isOnline) users = LoginMenu.getOnlineUsers();
         else users = LoginMenu.getUsers();
@@ -337,7 +337,7 @@ public class ClientThread extends Thread {
             bufferedWriter.flush();
 
         } catch (IOException e) {
-            //close();
+            close();
             e.printStackTrace();
         }
     }

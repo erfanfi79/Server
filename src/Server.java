@@ -4,11 +4,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import packet.serverPacket.ServerEnum;
+import packet.serverPacket.ServerEnumPacket;
 
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
 public class Server extends Application implements Runnable {
+    private static ArrayList<ClientThread> onlineUsers = new ArrayList<>();
     private static ArrayList<ClientThread> waitersForMultiPlayerGame = new ArrayList<>();
     private static Stage stage;
     private double x, y;
@@ -77,18 +80,9 @@ public class Server extends Application implements Runnable {
 
     }
 
-    @Override
-    public void run() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(8888);
-            while (true) {
-                System.err.println("Waiting for connect a client ...");
-                new ClientThread(serverSocket.accept());
-                System.err.println("Client connected");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void updateScoreBoard() {
+        for (ClientThread clientThread : onlineUsers)
+            clientThread.sendPacketToClient(new ServerEnumPacket(ServerEnum.UPDATE_LEADER_BOARD));
     }
 
     @Override
@@ -97,5 +91,19 @@ public class Server extends Application implements Runnable {
         new Thread(this).start();
         //gotoServerShop();
         // gotoServerUsers();
+    }
+
+    @Override
+    public void run() {
+        try {
+            ServerSocket serverSocket = new ServerSocket(8888);
+            while (true) {
+                System.err.println("Waiting for connect a client ...");
+                onlineUsers.add(new ClientThread(serverSocket.accept()));
+                System.err.println("Client connected");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
