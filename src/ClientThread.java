@@ -254,6 +254,7 @@ public class ClientThread extends Thread {
         }
     }
 
+
     private void matchEnumInputHandler(ClientMatchEnumPacket packet) {
 
         switch (packet.getPacket()) {
