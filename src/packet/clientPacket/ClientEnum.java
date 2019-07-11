@@ -15,5 +15,6 @@ public enum ClientEnum {
     MULTI_PLAYER,
     SINGLE_PLAYER,
     CHECK_DECK,
-    LEADER_BOARD_ONLINE
+    LEADER_BOARD_ONLINE,
+    AUCTION
 }
