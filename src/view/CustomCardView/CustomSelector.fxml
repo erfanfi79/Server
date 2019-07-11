@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustomCardController">
+   <children>
+      <Button fx:id="create_buff" layoutX="47.0" layoutY="82.0" mnemonicParsing="false" onAction="#startBuff" prefHeight="31.0" prefWidth="478.0" text="Create Buff" />
+      <Button fx:id="create_spell" layoutX="47.0" layoutY="214.0" mnemonicParsing="false" onAction="#startSpell" prefHeight="31.0" prefWidth="478.0" text="Create Spell" />
+      <Button fx:id="create_target" layoutX="47.0" layoutY="147.0" mnemonicParsing="false" onAction="#startTarget" prefHeight="31.0" prefWidth="478.0" text="Create Target" />
+      <Button fx:id="create_unit" layoutX="47.0" layoutY="284.0" mnemonicParsing="false" onAction="#startUnit" prefHeight="31.0" prefWidth="478.0" text="Create Unit" />
+      <Button fx:id="back_selector" layoutX="254.0" layoutY="337.0" mnemonicParsing="false" onAction="#backToMainMenu" text="Back" />
+   </children>
+</AnchorPane>

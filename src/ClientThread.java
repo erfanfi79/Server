@@ -80,13 +80,15 @@ public class ClientThread extends Thread {
             }
         } catch (Exception e) {
             System.err.println("client disconnected");
-//            Server.getOnlineUsers().remove(this);
-//            close();
+            close();
         }
     }
 
     public void handleAuction(ClientAuctionPacket packet) {
-
+        if (packet.isInAuctionMenu())
+            AuctionController.getInstance().addPrice(packet.getPrice(), account);
+        else
+            AuctionController.getInstance().buildAuction(packet, account);
     }
 
     public void handleCheatCode(ClientCheatPacket packet) {
@@ -109,7 +111,6 @@ public class ClientThread extends Thread {
             if (account != null)
                 LoginMenu.getOnlineUsers().remove(account);
             Server.getOnlineUsers().remove(this);
-            sendPacketToClient(new ServerEnumPacket(ServerEnum.CLOSE));
         } catch (Exception e) {
         }
         try {
@@ -197,9 +198,6 @@ public class ClientThread extends Thread {
 
             case AUCTION:
                 sendPacketToClient(AuctionController.getInstance().getPacket());
-                break;
-            case CLOSE:
-                close();
                 break;
         }
     }
@@ -368,7 +366,6 @@ public class ClientThread extends Thread {
     }
 
     public void sendPacketToClient(ServerPacket serverPacket) {
-
         try {
             bufferedWriter.write(YaGsonChanger.write(serverPacket));
             bufferedWriter.newLine();
@@ -417,7 +414,7 @@ public class ClientThread extends Thread {
         sendPacketToClient(serverLogPacket);
     }
 
-    private void enterShop() {
+    public void enterShop() {
         Collection collection = GlobalShop.getGlobalShop().getShopCollection();
         sendPacketToClient(new ServerCollection(getNewCollection(), collection));
         ServerMoneyPacket serverMoneyPacket = new ServerMoneyPacket();

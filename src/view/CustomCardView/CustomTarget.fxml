@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustomCardController">
+    <TextArea fx:id="rows" layoutX="17.0" layoutY="62.0" prefHeight="48.0" prefWidth="139.0" />
+    <TextArea fx:id="affect_target" layoutX="285.0" layoutY="62.0" prefHeight="48.0" prefWidth="114.0" />
+    <TextArea fx:id="hybrid" layoutX="421.0" layoutY="62.0" prefHeight="48.0" prefWidth="114.0" />
+    <TextArea fx:id="melee" layoutX="29.0" layoutY="176.0" prefHeight="48.0" prefWidth="153.0" />
+    <TextArea fx:id="columns" layoutX="168.0" layoutY="62.0" prefHeight="48.0" prefWidth="104.0" />
+   <TextArea fx:id="ranged" layoutX="224.0" layoutY="176.0" prefHeight="48.0" prefWidth="153.0" />
+   <TextArea fx:id="friend_or_enemy" layoutX="402.0" layoutY="176.0" prefHeight="48.0" prefWidth="153.0" />
+   <Button fx:id="save_target" layoutX="258.0" layoutY="280.0" mnemonicParsing="false" onAction="#saveTarget" text="Save Target" />
+   <Button fx:id="back_target" layoutX="275.0" layoutY="341.0" mnemonicParsing="false" onAction="#backToCustomCard" text="Back" />
+   <Label layoutX="77.0" layoutY="28.0" text="Rows" />
+   <Label layoutX="64.0" layoutY="140.0" text="Affect Melee" />
+   <Label layoutX="195.0" layoutY="28.0" text="Columns" />
+   <Label layoutX="299.0" layoutY="28.0" text="Affect Target" />
+   <Label layoutX="421.0" layoutY="28.0" text="Affect Hybrid" />
+   <Label layoutX="260.0" layoutY="140.0" text="Affect Ranged" />
+   <Label layoutX="423.0" layoutY="140.0" text="Friend Or Enemy" />
+   <Label layoutX="43.0" layoutY="235.0" text="Target Name" />
+   <TextArea fx:id="target_name1" layoutX="10.0" layoutY="272.0" prefHeight="48.0" prefWidth="153.0" />
+
+
+</AnchorPane>

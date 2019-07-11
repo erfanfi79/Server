@@ -17,5 +17,4 @@ public enum ClientEnum {
     CHECK_DECK,
     LEADER_BOARD_ONLINE,
     AUCTION,
-    CLOSE
 }
