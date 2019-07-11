@@ -19,6 +19,8 @@ public class ClientThread extends Thread {
     private MatchManager matchManager;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
+    private InputStreamReader inputStreamReader;
+    private OutputStreamWriter outputStreamWriter;
     private Socket socket;
     private double sellPercent = 0.75d;
     private boolean isPlaying = false;
@@ -26,10 +28,13 @@ public class ClientThread extends Thread {
 
     public ClientThread(Socket socket) {
 
-        this.socket = socket;
+
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            this.socket = socket;
+            inputStreamReader = new InputStreamReader(socket.getInputStream());
+            outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
+            bufferedReader = new BufferedReader(inputStreamReader);
+            bufferedWriter = new BufferedWriter(outputStreamWriter);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,9 +42,9 @@ public class ClientThread extends Thread {
         try {
             start();
         } catch (Exception e) {
+            System.err.println("client disconnected");
             if (account != null)
                 LoginMenu.getOnlineUsers().remove(account);
-            e.printStackTrace();
         }
     }
 
@@ -59,6 +64,9 @@ public class ClientThread extends Thread {
                 else if (packet instanceof ClientChatRoomPacket)
                     ChatRoom.getInstance().sendMassage(account, (ClientChatRoomPacket) packet);
 
+                else if (packet instanceof ClientAuctionPacket)
+                    handleAuction((ClientAuctionPacket) packet);
+
                 else if (packet instanceof ClientLoginPacket)
                     accountMenu((ClientLoginPacket) packet);
 
@@ -71,10 +79,16 @@ public class ClientThread extends Thread {
                 } else if (packet instanceof ClientCheatPacket) handleCheatCode((ClientCheatPacket) packet);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-//            Server.getOnlineUsers().remove(this);
-//            close();
+            System.err.println("client disconnected");
+            close();
         }
+    }
+
+    public void handleAuction(ClientAuctionPacket packet) {
+        if (packet.isInAuctionMenu())
+            AuctionController.getInstance().addPrice(packet.getPrice(), account);
+        else
+            AuctionController.getInstance().buildAuction(packet, account);
     }
 
     public void handleCheatCode(ClientCheatPacket packet) {
@@ -92,11 +106,35 @@ public class ClientThread extends Thread {
     }
 
     public void close() {
+
+        try {
+            if (account != null)
+                LoginMenu.getOnlineUsers().remove(account);
+            Server.getOnlineUsers().remove(this);
+        } catch (Exception e) {
+        }
+        try {
+            if (outputStreamWriter != null) outputStreamWriter.close();
+
+        } catch (Exception e) {
+        }
+        try {
+            if (inputStreamReader != null) inputStreamReader.close();
+
+        } catch (Exception e) {
+        }
         try {
             if (socket != null) socket.close();
-            if (bufferedWriter != null) bufferedWriter.close();
+
+        } catch (Exception e) {
+        }
+        try {
             if (bufferedReader != null) bufferedReader.close();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+        }
+        try {
+            if (bufferedWriter != null) bufferedWriter.close();
+        } catch (Exception e) {
         }
     }
 
@@ -156,8 +194,13 @@ public class ClientThread extends Thread {
             case LEADER_BOARD_ONLINE:
                 sendLeaderBoard(true);
                 break;
+
+            case AUCTION:
+                sendPacketToClient(AuctionController.getInstance().getPacket());
+                break;
         }
     }
+
     private void checkValidateDeck() {
         ServerLogPacket packet = new ServerLogPacket();
         if (account.getCollection().getSelectedDeck() == null) {
@@ -182,7 +225,7 @@ public class ClientThread extends Thread {
         sendPacketToClient(historyPacket);
     }
 
-    private void sendLeaderBoard(boolean isOnline) {
+    public void sendLeaderBoard(boolean isOnline) {
         ArrayList<Account> users = new ArrayList<>();
         if (isOnline) users = LoginMenu.getOnlineUsers();
         else users = LoginMenu.getUsers();
@@ -211,11 +254,9 @@ public class ClientThread extends Thread {
             if (isMultiPlayer) {
 
                 if (Server.getWaitersForMultiPlayerGame().size() == 0) {
-                    System.err.println("khalie khalie");
                     Server.getWaitersForMultiPlayerGame().add(this);
                     matchInputHandler();
                 } else {
-                    System.err.println("pore");
                     matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
                     matchManager.sendStartMultiPlayerMatchPacketToClients();
                     matchManager.sendPlayersNameToClients();
@@ -272,6 +313,7 @@ public class ClientThread extends Thread {
         }
     }
 
+
     private void matchEnumInputHandler(ClientMatchEnumPacket packet) {
 
         switch (packet.getPacket()) {
@@ -317,14 +359,13 @@ public class ClientThread extends Thread {
     }
 
     public void sendPacketToClient(ServerPacket serverPacket) {
-
         try {
             bufferedWriter.write(YaGsonChanger.write(serverPacket));
             bufferedWriter.newLine();
             bufferedWriter.flush();
 
         } catch (IOException e) {
-            //close();
+            close();
             e.printStackTrace();
         }
     }
@@ -366,7 +407,7 @@ public class ClientThread extends Thread {
         sendPacketToClient(serverLogPacket);
     }
 
-    private void enterShop() {
+    public void enterShop() {
         Collection collection = GlobalShop.getGlobalShop().getShopCollection();
         sendPacketToClient(new ServerCollection(getNewCollection(), collection));
         ServerMoneyPacket serverMoneyPacket = new ServerMoneyPacket();

@@ -227,7 +227,6 @@ public class MatchManager {
             playAI();
             gameLogic.switchTurn();
             sendStartYourTurnToClient(clientThread1);
-            sendMatchInfoToClients();
         }
     }
 
@@ -488,7 +487,7 @@ public class MatchManager {
                     if (isUnitStunned((Unit) hero)) continue;
                     if (isAttackedPreviously(hero)) continue;
                     if (isMovedPreviously(hero)) continue;
-                    if (isDirectionWithoutEnemyForMove(hero.getCell(), destinationCell))
+                    if (!isDirectionWithoutEnemyForMove(hero.getCell(), destinationCell))
                         continue;
 
                     //move

@@ -156,10 +156,9 @@ public class GameLogic {
     public void switchTurn() {
         match.turnNumber++;
         manaHandler();
-        getMatchResult();
         match.findPlayerPlayingThisTurn().getHand().fillHandEmptyPlace();
-        attackedCardsInATurn = new ArrayList<>();
-        movedCardsInATurn = new ArrayList<>();
+        attackedCardsInATurn.clear();
+        movedCardsInATurn.clear();
     }
 
     private void manaHandler() {
