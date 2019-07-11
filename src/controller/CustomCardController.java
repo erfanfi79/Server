@@ -22,7 +22,7 @@ public class CustomCardController {
     @FXML
     public void startBuff(ActionEvent event) throws Exception {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CustomBuff.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/CustomCardView/CustomBuff.fxml"));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
@@ -35,7 +35,7 @@ public class CustomCardController {
     @FXML
     public void startTarget(ActionEvent event) throws Exception {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CustomTarget.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/CustomCardView/CustomTarget.fxml"));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
@@ -48,7 +48,7 @@ public class CustomCardController {
     @FXML
     public void startSpell(ActionEvent event) throws Exception {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CustomSpell.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/CustomCardView/CustomSpell.fxml"));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
@@ -61,7 +61,7 @@ public class CustomCardController {
     @FXML
     public void startUnit(ActionEvent event) throws Exception {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CustomUnit.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/CustomCardView/CustomUnit.fxml"));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
@@ -74,7 +74,7 @@ public class CustomCardController {
     @FXML
     public void backToMainMenu(ActionEvent event) throws Exception {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainMenu.fxml")); //todo change for network
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/CustomCardView/MainMenu.fxml")); //todo change for network
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
@@ -87,7 +87,7 @@ public class CustomCardController {
     @FXML
     public void backToCustomCard(ActionEvent event) throws Exception {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CustomSelector.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/CustomCardView/CustomSelector.fxml"));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));

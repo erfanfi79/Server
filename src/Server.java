@@ -94,6 +94,7 @@ public class Server extends Application implements Runnable {
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
         new Thread(this).start();
+        openCardCustom();
         //gotoServerShop();
         // gotoServerUsers();
     }
@@ -107,6 +108,31 @@ public class Server extends Application implements Runnable {
                 onlineUsers.add(new ClientThread(serverSocket.accept()));
                 System.err.println("Client connected");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void openCardCustom() {
+        try {
+            Stage primaryStage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("view/CustomCardView/CustomSelector.fxml"));
+            Parent root = fxmlLoader.load();
+            primaryStage.initStyle(StageStyle.UNDECORATED);
+            root.setOnMousePressed(event -> {
+                x = event.getSceneX();
+                y = event.getSceneY();
+            });
+
+            root.setOnMouseDragged(event -> {
+
+                primaryStage.setX(event.getScreenX() - x);
+                primaryStage.setY(event.getScreenY() - y);
+
+            });
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
