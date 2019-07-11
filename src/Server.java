@@ -96,6 +96,6 @@ public class Server extends Application implements Runnable {
         stage = primaryStage;
         new Thread(this).start();
         //gotoServerShop();
-        // gotoServerUsers();
+        //gotoServerUsers();
     }
 }

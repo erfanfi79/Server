@@ -19,6 +19,8 @@ public class ClientThread extends Thread {
     private MatchManager matchManager;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
+    private InputStreamReader inputStreamReader;
+    private OutputStreamWriter outputStreamWriter;
     private Socket socket;
     private double sellPercent = 0.75d;
     private boolean isPlaying = false;
@@ -26,10 +28,13 @@ public class ClientThread extends Thread {
 
     public ClientThread(Socket socket) {
 
-        this.socket = socket;
+
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            this.socket = socket;
+            inputStreamReader = new InputStreamReader(socket.getInputStream());
+            outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
+            bufferedReader = new BufferedReader(inputStreamReader);
+            bufferedWriter = new BufferedWriter(outputStreamWriter);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,9 +42,9 @@ public class ClientThread extends Thread {
         try {
             start();
         } catch (Exception e) {
+            System.err.println("client disconnected");
             if (account != null)
                 LoginMenu.getOnlineUsers().remove(account);
-            e.printStackTrace();
         }
     }
 
@@ -71,7 +76,7 @@ public class ClientThread extends Thread {
                 } else if (packet instanceof ClientCheatPacket) handleCheatCode((ClientCheatPacket) packet);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("client disconnected");
 //            Server.getOnlineUsers().remove(this);
 //            close();
         }
@@ -94,8 +99,11 @@ public class ClientThread extends Thread {
     public void close() {
         try {
             if (socket != null) socket.close();
+            if (inputStreamReader != null) inputStreamReader.close();
+            if (outputStreamWriter != null) outputStreamWriter.close();
             if (bufferedWriter != null) bufferedWriter.close();
             if (bufferedReader != null) bufferedReader.close();
+
         } catch (Exception ignored) {
         }
     }
@@ -211,11 +219,9 @@ public class ClientThread extends Thread {
             if (isMultiPlayer) {
 
                 if (Server.getWaitersForMultiPlayerGame().size() == 0) {
-                    System.err.println("khalie khalie");
                     Server.getWaitersForMultiPlayerGame().add(this);
                     matchInputHandler();
                 } else {
-                    System.err.println("pore");
                     matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
                     matchManager.sendStartMultiPlayerMatchPacketToClients();
                     matchManager.sendPlayersNameToClients();
