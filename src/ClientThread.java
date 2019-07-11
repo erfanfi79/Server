@@ -184,6 +184,7 @@ public class ClientThread extends Thread {
                 break;
 
             case MULTI_PLAYER:
+                System.out.println(account.getUserName() + " wanted multi player");
                 createMatch(true);
                 break;
 
@@ -258,12 +259,15 @@ public class ClientThread extends Thread {
                 if (Server.getWaitersForMultiPlayerGame().size() == 0) {
                     Server.getWaitersForMultiPlayerGame().add(this);
                     matchInputHandler();
+
                 } else {
                     matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
                     matchManager.sendStartMultiPlayerMatchPacketToClients();
                     matchManager.sendPlayersNameToClients();
                     matchManager.sendMatchInfoToClients();
                     matchManager.sendStartYourTurnToClient(Server.getWaitersForMultiPlayerGame().get(0));
+                    matchManager.sendNewHandToClient(this);
+                    matchManager.sendNewHandToClient(Server.getWaitersForMultiPlayerGame().get(0));
 
                     Server.getWaitersForMultiPlayerGame().remove(0);
 
@@ -275,6 +279,7 @@ public class ClientThread extends Thread {
                 matchManager.sendPlayersNameToClients();
                 matchManager.sendMatchInfoToClients();
                 matchManager.sendStartYourTurnToClient(this);
+                matchManager.sendNewHandToClient(this);
 
                 matchInputHandler();
             }
@@ -310,6 +315,8 @@ public class ClientThread extends Thread {
                 enumPacketHandler((ClientEnumPacket) packet);
 
             matchManager.sendMatchInfoToClients();
+            matchManager.sendNewHandToClient(this);
+            matchManager.sendGraveYardToClient(this);
 
             if (matchManager.isMatchFinished()) isPlaying = false;
         }

@@ -228,6 +228,9 @@ public class MatchManager {
             gameLogic.switchTurn();
             sendStartYourTurnToClient(clientThread1);
         }
+
+        sendGraveYardToClient(clientThread1);
+        if (isMultiPlayer) sendGraveYardToClient(clientThread2);
     }
 
 
@@ -236,7 +239,7 @@ public class MatchManager {
     }
 
 
-    public void sendGraveYardToClient(ClientThread client) {
+    void sendGraveYardToClient(ClientThread client) {
 
         if (client.getAccount().getUserName().equals(match.getPlayer1().getUserName()))
             client.sendPacketToClient(new ServerGraveYardPacket(match.getPlayer1GraveYard().getDeadCards()));
@@ -245,7 +248,7 @@ public class MatchManager {
     }
 
 
-    public boolean isMatchFinished() {
+    boolean isMatchFinished() {
 
         MatchResult matchResult = gameLogic.getMatchResult();
         if (matchResult == MatchResult.MATCH_HAS_NOT_ENDED) return false;
@@ -322,8 +325,29 @@ public class MatchManager {
         if (isMultiPlayer) clientThread2.sendPacketToClient(serverAttackPacket);
     }
 
-    public void sendStartYourTurnToClient(ClientThread clientThread) {
+    void sendStartYourTurnToClient(ClientThread clientThread) {
         clientThread.sendPacketToClient(new ServerMatchEnumPacket(ServerMatchEnum.START_YOUR_TURN));
+    }
+
+    void sendNewHandToClient(ClientThread clientThread) {
+
+        ArrayList<Card> handCards = clientThread.getAccount().getHand().getHandCards();
+        VirtualCard[] handVirtualCards = new VirtualCard[6];
+
+        for (int i = 0; i < handCards.size(); i++) {
+
+            if (handCards.get(i) instanceof Unit)
+                handVirtualCards[i] = getVirtualCard((Unit) handCards.get(i));
+            else if (handCards.get(i) instanceof Spell)
+                handVirtualCards[i] = getVirtualCard((Spell) handCards.get(i));
+        }
+
+        Card reserveCard = clientThread.getAccount().getHand().getReserveCard();
+
+        if (reserveCard instanceof Unit) handVirtualCards[5] = getVirtualCard((Unit) reserveCard);
+        else if (reserveCard instanceof Spell) handVirtualCards[5] = getVirtualCard((Spell) reserveCard);
+
+        clientThread.sendPacketToClient(new ServerHandPacket(handVirtualCards));
     }
 
 
@@ -457,6 +481,11 @@ public class MatchManager {
     private VirtualCard getVirtualCard(Unit card) {
         return new VirtualCard(
                 card.getCardName(), card.getManaCost(), card.getHealthPoint(), card.getAttackPoint());
+    }
+
+    private VirtualCard getVirtualCard(Spell card) {
+        return new VirtualCard(
+                card.getCardName(), card.getManaCost(), 0, 0);
     }
 
     private void playAI() {
