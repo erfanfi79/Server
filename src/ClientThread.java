@@ -20,8 +20,9 @@ public class ClientThread extends Thread {
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private Socket socket;
-
+    private double sellPercent = 0.75d;
     private boolean isPlaying = false;
+    private boolean isHalfPrice = false;
 
     public ClientThread(Socket socket) {
 
@@ -36,8 +37,8 @@ public class ClientThread extends Thread {
         try {
             start();
         } catch (Exception e) {
-
-            Server.getOnlineUsers().remove(this);
+            if (account != null)
+                LoginMenu.getOnlineUsers().remove(account);
             e.printStackTrace();
         }
     }
@@ -67,13 +68,27 @@ public class ClientThread extends Thread {
                 else if (packet instanceof ClientCollectionPacket) {
                     account.setCollection(((ClientCollectionPacket) packet).getMyCollection());
                     Account.save(account);
-                }
+                } else if (packet instanceof ClientCheatPacket) handleCheatCode((ClientCheatPacket) packet);
             }
         } catch (Exception e) {
             e.printStackTrace();
 //            Server.getOnlineUsers().remove(this);
 //            close();
         }
+    }
+
+    public void handleCheatCode(ClientCheatPacket packet) {
+        if (packet.getDoubleMoney()) {
+            account.setMoney(account.getMoney() * 2);
+            ServerMoneyPacket serverMoneyPacket = new ServerMoneyPacket();
+            serverMoneyPacket.setMoney(account.getMoney());
+            sendPacketToClient(serverMoneyPacket);
+        }
+        if (packet.getEqualSell())
+            sellPercent = 1;
+        if (packet.getHalfPrice())
+            isHalfPrice = true;
+
     }
 
     public void close() {
@@ -103,7 +118,7 @@ public class ClientThread extends Thread {
                 break;
 
             case LEADER_BOARD:
-                sendLeaderBoard();
+                sendLeaderBoard(false);
                 break;
 
             case MATCH_HISTORY:
@@ -138,9 +153,11 @@ public class ClientThread extends Thread {
             case SINGLE_PLAYER:
                 createMatch(false);
                 break;
+            case LEADER_BOARD_ONLINE:
+                sendLeaderBoard(true);
+                break;
         }
     }
-
     private void checkValidateDeck() {
         ServerLogPacket packet = new ServerLogPacket();
         if (account.getCollection().getSelectedDeck() == null) {
@@ -165,18 +182,20 @@ public class ClientThread extends Thread {
         sendPacketToClient(historyPacket);
     }
 
-    private void sendLeaderBoard() {
-
+    private void sendLeaderBoard(boolean isOnline) {
+        ArrayList<Account> users = new ArrayList<>();
+        if (isOnline) users = LoginMenu.getOnlineUsers();
+        else users = LoginMenu.getUsers();
         ArrayList<String> userNames = new ArrayList<>();
         ArrayList<Integer> winNumber = new ArrayList<>();
-        if (LoginMenu.getUsers().size() > 0)
-            Collections.sort(LoginMenu.getUsers(), new Comparator<Account>() {
+        if (users.size() > 0)
+            Collections.sort(users, new Comparator<Account>() {
                 public int compare(Account account1, Account account2) {
                     return account1.getWinsNumber() - account2.getWinsNumber();
                 }
             });
 
-        for (Account account : LoginMenu.getUsers()) {
+        for (Account account : users) {
             userNames.add(account.getUserName());
             winNumber.add(account.getWinsNumber());
         }
@@ -195,9 +214,7 @@ public class ClientThread extends Thread {
                     System.err.println("khalie khalie");
                     Server.getWaitersForMultiPlayerGame().add(this);
                     matchInputHandler();
-                }
-
-                else {
+                } else {
                     System.err.println("pore");
                     matchManager = new MatchManager(Server.getWaitersForMultiPlayerGame().get(0), this);
                     matchManager.sendStartMultiPlayerMatchPacketToClients();
@@ -208,6 +225,7 @@ public class ClientThread extends Thread {
                     Server.getWaitersForMultiPlayerGame().remove(0);
 
                     matchInputHandler();
+
                 }
             } else {
                 matchManager = new MatchManager(this);
@@ -281,8 +299,10 @@ public class ClientThread extends Thread {
         LoginHandler loginHandler = new LoginHandler(clientLoginPacket);
         ServerLogPacket serverLogPacket = loginHandler.handleLogin();
 
-        if (serverLogPacket.isSuccessful())
-            this.account = loginHandler.getAccount();
+        if (serverLogPacket.isSuccessful()) {
+            account = loginHandler.getAccount();
+            LoginMenu.getOnlineUsers().add(account);
+        }
         sendPacketToClient(serverLogPacket);
     }
 
@@ -305,7 +325,7 @@ public class ClientThread extends Thread {
             bufferedWriter.flush();
 
         } catch (IOException e) {
-//            close();
+            //close();
             e.printStackTrace();
         }
     }
@@ -314,9 +334,13 @@ public class ClientThread extends Thread {
         if (packet.isBuy()) {
             ShopError error = GlobalShop.getGlobalShop().buy(packet.getCardName(), account);
             ServerLogPacket serverLogPacket = new ServerLogPacket();
-            if (error.equals(ShopError.SUCCESS))
+            if (error.equals(ShopError.SUCCESS)) {
+                if (isHalfPrice) {
+                    int price = GlobalShop.getGlobalShop().getCardCost(packet.getCardName()) / 2;
+                    account.setMoney(account.getMoney() + price);
+                }
                 serverLogPacket.setSuccessful(true);
-            else serverLogPacket.setLog(error.toString());
+            } else serverLogPacket.setLog(error.toString());
 
         } else sell(packet.getCardName());
         enterShop();
@@ -327,7 +351,7 @@ public class ClientThread extends Thread {
         for (int i = cards.size() - 1; i >= 0; i--)
             if (cards.get(i).getCardName().equals(cardName)) {
                 Card soldCard = cards.get(i);
-                account.setMoney(account.getMoney() + (soldCard.getPrice() * 3) / 4);
+                account.setMoney(account.getMoney() + (int) (soldCard.getPrice() * sellPercent));
                 ServerMoneyPacket serverMoneyPacket = new ServerMoneyPacket();
                 serverMoneyPacket.setMoney(account.getMoney());
                 sendPacketToClient(serverMoneyPacket);

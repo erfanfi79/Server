@@ -1,33 +1,28 @@
 import controller.CardController;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import models.Card;
 import models.GlobalShop;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class ServerShopView extends Application implements Runnable {
+public class ServerShopView implements Runnable {
     private static ServerShopView serverShopView;
     private double x, y;
+
+    public static void setServerShopView(ServerShopView serverShopView) {
+        ServerShopView.serverShopView = serverShopView;
+    }
 
     @FXML
     private HBox hBox2;
 
     @FXML
     private HBox hBox1;
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     @Override
     public void run() {
@@ -41,27 +36,7 @@ public class ServerShopView extends Application implements Runnable {
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("view/shopMenuView/ShopMenuView.fxml"));
-        Parent root = fxmlLoader.load();
-        serverShopView = fxmlLoader.getController();
-        new Thread(this).start();
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        root.setOnMouseDragged(event -> {
 
-            primaryStage.setX(event.getScreenX() - x);
-            primaryStage.setY(event.getScreenY() - y);
-
-        });
-        root.setOnMousePressed(event -> {
-            x = event.getSceneX();
-            y = event.getSceneY();
-        });
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
-    }
 
     public void showCards(ArrayList<Card> cards) {
         Node[] nodes;

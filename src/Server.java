@@ -1,32 +1,101 @@
-import java.io.IOException;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.net.ServerSocket;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-public class Server {
+public class Server extends Application implements Runnable {
+    private static ArrayList<ClientThread> waitersForMultiPlayerGame = new ArrayList<>();
+    private static Stage stage;
+    private double x, y;
 
-    private static LinkedList<ClientThread> onlineUsers = new LinkedList<>();
-    private static LinkedList<ClientThread> waitersForMultiPlayerGame = new LinkedList<>();
-
-    public static LinkedList<ClientThread> getOnlineUsers() {
-        return onlineUsers;
-    }
-
-    public static LinkedList<ClientThread> getWaitersForMultiPlayerGame() {
+    public static ArrayList<ClientThread> getWaitersForMultiPlayerGame() {
         return waitersForMultiPlayerGame;
     }
 
+    public static void main(String[] args) {
+        launch(args);
+    }
 
-    public static void main(String[] args) throws IOException {
+    void gotoServerShop() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("view/shopMenuView/ShopMenuView.fxml"));
+            Parent root = fxmlLoader.load();
+            ServerShopView.setServerShopView(fxmlLoader.getController());
+            Thread thread = new Thread(new ServerShopView());
+            thread.start();
+            stage.initStyle(StageStyle.UNDECORATED);
+            root.setOnMouseDragged(event -> {
 
-        ServerSocket serverSocket = new ServerSocket(8888);
+                stage.setX(event.getScreenX() - x);
+                stage.setY(event.getScreenY() - y);
 
-        while (true) {
-
-            System.err.println("Waiting for connect a client ...");
-
-            onlineUsers.add(new ClientThread(serverSocket.accept()));
-
-            System.err.println("Client connected");
+            });
+            root.setOnMousePressed(event -> {
+                x = event.getSceneX();
+                y = event.getSceneY();
+            });
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    void gotoServerUsers() {
+        try {
+            Stage primaryStage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("view/Users.fxml"));
+            Parent root = fxmlLoader.load();
+            ServerUsersViewController serverUsersViewController = fxmlLoader.getController();
+            serverUsersViewController.onlineCheckBox();
+            ServerUsersViewController.setServerUsersViewController(serverUsersViewController);
+            new Thread(new ServerUsersViewController()).start();
+            primaryStage.initStyle(StageStyle.UNDECORATED);
+            root.setOnMousePressed(event -> {
+                x = event.getSceneX();
+                y = event.getSceneY();
+            });
+
+            root.setOnMouseDragged(event -> {
+
+                primaryStage.setX(event.getScreenX() - x);
+                primaryStage.setY(event.getScreenY() - y);
+
+            });
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void run() {
+        try {
+            ServerSocket serverSocket = new ServerSocket(8888);
+            while (true) {
+                System.err.println("Waiting for connect a client ...");
+                new ClientThread(serverSocket.accept());
+                System.err.println("Client connected");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
+        new Thread(this).start();
+        //gotoServerShop();
+        // gotoServerUsers();
     }
 }

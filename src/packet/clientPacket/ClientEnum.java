@@ -14,5 +14,6 @@ public enum ClientEnum {
     EXIT_CHATROOM,
     MULTI_PLAYER,
     SINGLE_PLAYER,
-    CHECK_DECK
+    CHECK_DECK,
+    LEADER_BOARD_ONLINE
 }
