@@ -78,4 +78,13 @@ public class GlobalShop {
 
         return 0;
     }
+
+    public Card getCardByName(String name) {
+        for (Card card : shopCollection.getCards())
+            if (card.getCardName().equals(name)) {
+                Card newCard = Card.deepClone(card);
+                return newCard;
+            }
+        return null;
+    }
 }

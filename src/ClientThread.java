@@ -104,14 +104,36 @@ public class ClientThread extends Thread {
     }
 
     public void close() {
+
+        try {
+            if (account != null)
+                LoginMenu.getOnlineUsers().remove(account);
+            Server.getOnlineUsers().remove(this);
+            sendPacketToClient(new ServerEnumPacket(ServerEnum.CLOSE));
+        } catch (Exception e) {
+        }
+        try {
+            if (outputStreamWriter != null) outputStreamWriter.close();
+
+        } catch (Exception e) {
+        }
+        try {
+            if (inputStreamReader != null) inputStreamReader.close();
+
+        } catch (Exception e) {
+        }
         try {
             if (socket != null) socket.close();
-            if (inputStreamReader != null) inputStreamReader.close();
-            if (outputStreamWriter != null) outputStreamWriter.close();
-            if (bufferedWriter != null) bufferedWriter.close();
-            if (bufferedReader != null) bufferedReader.close();
 
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+        }
+        try {
+            if (bufferedReader != null) bufferedReader.close();
+        } catch (Exception e) {
+        }
+        try {
+            if (bufferedWriter != null) bufferedWriter.close();
+        } catch (Exception e) {
         }
     }
 
@@ -173,7 +195,10 @@ public class ClientThread extends Thread {
                 break;
 
             case AUCTION:
-
+                sendPacketToClient(AuctionController.getInstance().getPacket());
+                break;
+            case CLOSE:
+                close();
                 break;
         }
     }
