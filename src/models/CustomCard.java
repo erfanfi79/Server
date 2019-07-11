@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class CustomCard {
-    private Unit setUnit(String name, int hp, int ap, UnitType unitType, int range, int price, Spell... specialPower) {
+    private Unit setUnit(String name, int hp, int ap, UnitType unitType, int range, int price, Spell... specialPower) throws Exception{
         Unit unit = new Unit();
         unit.setCardName(name);
         unit.setHP(hp);
@@ -17,18 +17,19 @@ public class CustomCard {
         for (Spell spell : specialPower)
             unit.addSpell(spell);
         unit.setPrice(price);
+        jsonUnit(unit);
         return unit;
     }
 
-    public Unit customHero(String name, int hp, int ap, UnitType unitType, int range, int price, Spell... specialPower) {
+    public Unit customHero(String name, int hp, int ap, UnitType unitType, int range, int price, Spell... specialPower) throws Exception {
         return setUnit(name, hp, ap, unitType, range, price, specialPower);
     }
 
-    public Unit customMinion(String name, int hp, int ap, UnitType unitType, int range, int price, Spell... specialPower) {
+    public Unit customMinion(String name, int hp, int ap, UnitType unitType, int range, int price, Spell... specialPower) throws Exception {
         return setUnit(name, hp, ap, unitType, range, price, specialPower);
     }
 
-    public Spell customSpell(String name, CardType type, int price, int coolDown, SpecialPowerType specialPowerType, Target target) {
+    public Spell customSpell(String name, CardType type, Buff buff,int price, int coolDown, SpecialPowerType specialPowerType, Target target) throws Exception {
         Spell spell = new Spell();
         spell.setCardName(name);
         spell.setSpellName(name);
@@ -37,6 +38,8 @@ public class CustomCard {
         spell.setCoolDown(coolDown);
         spell.setSpecialPowerType(specialPowerType);
         spell.setTarget(target);
+        spell.setBuff(buff);
+        jsonSpell(spell);
         return spell;
     }
 
@@ -58,7 +61,7 @@ public class CustomCard {
         return buff;
     }
 
-    public Target customTarget(int rowsAffected, int columnsAffected,
+    public Target customTarget(String name,int rowsAffected, int columnsAffected,
                                String affectTarget, boolean affectHybrid, boolean affectMelee, boolean affectRanged, String friendOrEnemy) {
         Target target = new Target();
         target.setRowsAffected(rowsAffected);
@@ -75,6 +78,7 @@ public class CustomCard {
         }
         TargetType targetType = new TargetType(affectHybrid, affectRanged, affectMelee);
         target.setTargetType(targetType);
+        target.setName(name);
         return target;
     }
     public void jsonUnit(Unit unit) throws IOException {

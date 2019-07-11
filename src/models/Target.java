@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Target implements Serializable {
     final int MAP_ROWS = 5;
     final int MAP_Columns = 9;
+    private String name;
     private int rowsAffected;
     private int columnsAffected;
     private boolean isAffectHero;
@@ -101,7 +102,11 @@ public class Target implements Serializable {
         this.targetType = targetType;
     }
 
-    Target() {
+    public void setName(String name){this.name = name;}
+
+    public String getName(){return name;}
+
+    public Target() {
 
     }
 }

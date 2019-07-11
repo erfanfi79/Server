@@ -81,4 +81,8 @@ public class Spell extends Card implements Serializable {
     public void setTarget(Target target) {
         this.target = target;
     }
+
+    public void setBuff(Buff buff){
+        this.buff = buff;
+    }
 }
